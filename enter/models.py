@@ -22,7 +22,9 @@ class Analysisresults(models.Model):
     result_description = models.TextField()
     result_imagepaths = models.CharField(max_length=255, blank=True, null=True)
     result_datetime = models.DateTimeField()
-    use_memo = models.IntegerField(blank=True, null=True)  # 메모사용여부 (0: 미사용, 1: 사용)
+    use_memo = models.IntegerField(
+        default=0, blank=True, null=True
+    )  # 메모사용여부 (0: 미사용, 1: 사용)
 
     class Meta:
         managed = False
@@ -115,7 +117,7 @@ class Users(models.Model):
     google_id = models.CharField(max_length=255, blank=True, null=True)
     role = models.CharField(max_length=5)  # admin: 관리자, user: 일반 사용자
     register_datetime = models.DateTimeField()
-    user_status = models.IntegerField()  # 0: 회원, 1: 탈퇴회원
+    user_status = models.IntegerField(default=0)  # 0: 회원, 1: 탈퇴회원
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
     class Meta:
