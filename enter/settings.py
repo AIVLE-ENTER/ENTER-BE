@@ -1,5 +1,6 @@
 from pathlib import Path
-import os, json
+import os
+import json
 from django.core.exceptions import ImproperlyConfigured
 
 # BASE 폴더
