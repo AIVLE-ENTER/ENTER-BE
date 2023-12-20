@@ -19,7 +19,7 @@ class Analysisresults(models.Model):
     chat_window = models.ForeignKey("Chatwindow", on_delete=models.CASCADE)
     request_message = models.CharField(max_length=1000)
     request_datetime = models.DateTimeField()
-    result_description = models.CharField()
+    result_description = models.TextField()
     result_imagepaths = models.CharField(max_length=255, blank=True, null=True)
     result_datetime = models.DateTimeField()
     use_memo = models.IntegerField(blank=True, null=True)  # 메모사용여부 (0: 미사용, 1: 사용)
@@ -71,7 +71,9 @@ class Prompttemplates(models.Model):
 
 class Qnaboard(models.Model):
     board_id = models.AutoField(primary_key=True)
-    question_user = models.ForeignKey("Users", on_delete=models.CASCADE)
+    question_user = models.ForeignKey(
+        "Users", on_delete=models.CASCADE, related_name="answer_user_qnaboard_set"
+    )
     question_type = models.ForeignKey("Questiontype", on_delete=models.CASCADE)
     question_title = models.CharField(max_length=30)
     question_content = models.CharField(max_length=100)
@@ -79,7 +81,11 @@ class Qnaboard(models.Model):
     question_file_path = models.CharField(max_length=255, blank=True, null=True)
     question_datetime = models.DateTimeField()
     answer_admin = models.ForeignKey(
-        "Users", on_delete=models.CASCADE, blank=True, null=True
+        "Users",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="question_admin_qnaboard_set",
     )
     answer_content = models.CharField(max_length=255, blank=True, null=True)
     answer_datetime = models.DateTimeField(blank=True, null=True)
@@ -107,9 +113,9 @@ class Users(models.Model):
     kakao_id = models.CharField(max_length=255, blank=True, null=True)
     naver_id = models.CharField(max_length=255, blank=True, null=True)
     google_id = models.CharField(max_length=255, blank=True, null=True)
-    role = models.CharField(max_length=5) # admin: 관리자, user: 일반 사용자
+    role = models.CharField(max_length=5)  # admin: 관리자, user: 일반 사용자
     register_datetime = models.DateTimeField()
-    user_status = models.IntegerField() # 0: 회원, 1: 탈퇴회원
+    user_status = models.IntegerField()  # 0: 회원, 1: 탈퇴회원
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
     class Meta:
