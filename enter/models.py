@@ -133,4 +133,4 @@ class Emailauth(models.Model):
 
     class Meta:
         managed = False
-        db_table = "emailAuth"
+        db_table = "EmailAuth"
