@@ -7,17 +7,19 @@ from django.core.exceptions import ImproperlyConfigured
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # secrets.json
-secret_file = os.path.join(BASE_DIR, 'secrets.json') 
+secret_file = os.path.join(BASE_DIR, "secrets.json")
 
 with open(secret_file) as f:
     secrets = json.loads(f.read())
 
+
 def get_env_variable(var_name):
-  try:
-    return secrets[var_name]
-  except KeyError:
-    error_msg = 'Set the {} environment variable'.format(var_name)
-    raise ImproperlyConfigured(error_msg)
+    try:
+        return secrets[var_name]
+    except KeyError:
+        error_msg = "Set the {} environment variable".format(var_name)
+        raise ImproperlyConfigured(error_msg)
+
 
 SECRET_KEY = get_env_variable("SECRET_KEY")
 
@@ -73,15 +75,15 @@ WSGI_APPLICATION = "enter.wsgi.application"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': get_env_variable("MYSQL_NAME"),
-        'USER': get_env_variable("MYSQL_USER"),
-        'PASSWORD': get_env_variable("MYSQL_PASSWORD"),
-        'HOST': get_env_variable("MYSQL_HOST"),
-        'PORT': get_env_variable("MYSQL_PORT"),
-        'OPTIONS': {
-            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+    "default": {
+        "ENGINE": "django.db.backends.mysql",
+        "NAME": get_env_variable("MYSQL_NAME"),
+        "USER": get_env_variable("MYSQL_USER"),
+        "PASSWORD": get_env_variable("MYSQL_PASSWORD"),
+        "HOST": get_env_variable("MYSQL_HOST"),
+        "PORT": get_env_variable("MYSQL_PORT"),
+        "OPTIONS": {
+            "init_command": "SET sql_mode='STRICT_TRANS_TABLES'",
         },
     }
 }
