@@ -115,3 +115,14 @@ class Users(models.Model):
     class Meta:
         managed = False
         db_table = "Users"
+
+
+class Emailauth(models.Model):
+    auth_id = models.AutoField(primary_key=True)
+    email = models.CharField(max_length=30)
+    certification_number = models.IntegerField()
+    created_datetime = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        managed = False
+        db_table = "emailAuth"
