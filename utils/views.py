@@ -18,10 +18,10 @@ def send_email(title: str, content: str, to_email: str):
 
 
 # 인증번호 DB 저장
-def save_email_auth(email: str, certification_number: int):
+def save_email_auth(email: str, certification_number: int, type: str):
     try:
         models.Emailauth.objects.create(
-            email=email, certification_number=certification_number
+            email=email, certification_number=certification_number, type=type
         )
         return {"success": True}
     except Exception as e:

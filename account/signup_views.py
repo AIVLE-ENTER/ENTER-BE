@@ -36,7 +36,7 @@ def send_certification_number(request):
         return JsonResponse(response_data, status=500)
 
     # 인증번호 저장
-    is_save = save_email_auth(email, certification_number)
+    is_save = save_email_auth(email, certification_number, "signup")
     print(is_save)
     if not is_save["success"]:
         response_data = {
