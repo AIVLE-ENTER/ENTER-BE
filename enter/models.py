@@ -107,9 +107,9 @@ class Users(models.Model):
     kakao_id = models.CharField(max_length=255, blank=True, null=True)
     naver_id = models.CharField(max_length=255, blank=True, null=True)
     google_id = models.CharField(max_length=255, blank=True, null=True)
-    role = models.CharField(max_length=5, db_comment="admin: 관리자, user: 일반 사용자")
+    role = models.CharField(max_length=5) # admin: 관리자, user: 일반 사용자
     register_datetime = models.DateTimeField()
-    user_status = models.IntegerField(db_comment="0: 회원, 1: 탈퇴회원")
+    user_status = models.IntegerField() # 0: 회원, 1: 탈퇴회원
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
 
     class Meta:
