@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     "utils",  # 공용 함수 관리
     "enter",
     "account",
+    "board",
 ]
 
 MIDDLEWARE = [
