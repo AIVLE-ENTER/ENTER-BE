@@ -9,4 +9,9 @@ urlpatterns = [
         views.check_certification_number,
         name="check-certification-number",
     ),
+    path(
+        "sendCertificationNumber/",
+        views.send_certification_number,
+        name="send-certification",
+    ),
 ]

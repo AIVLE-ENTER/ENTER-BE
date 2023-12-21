@@ -129,9 +129,19 @@ class Emailauth(models.Model):
     auth_id = models.AutoField(primary_key=True)
     email = models.CharField(max_length=30)
     certification_number = models.IntegerField()
-    type = models.CharField(max_length=20)
+    purpose = models.CharField(max_length=20)
     created_datetime = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = False
         db_table = "EmailAuth"
+
+
+class Emailtemplates(models.Model):
+    title = models.CharField(max_length=30)
+    content = models.TextField()
+    purpose = models.CharField(unique=True, max_length=20)
+
+    class Meta:
+        managed = False
+        db_table = "EmailTemplates"

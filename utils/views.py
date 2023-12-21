@@ -1,65 +1,63 @@
 from django.http import JsonResponse
-from django.core.mail import EmailMessage
-from datetime import datetime, timedelta
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
 from enter import models
+from utils.common import send_email, save_email_auth, is_valid_certification
+import random
+import json
 
 
-# 메일 전송
-def send_email(title: str, content: str, to_email: str):
-    try:
-        email = EmailMessage(
-            title,
-            content,
-            to=[to_email],
-        )
-        email.send()
-        return {"success": True}
-    except Exception as e:
-        print(f"Error creating Emailauth instance: {e}")
-        return {"success": False, "message": e}
+# 이메일로 인증번호 전송
+@csrf_exempt
+@require_POST
+def send_certification_number(request):
+    # 데이터 받아오기
+    json_data = json.loads(request.body.decode("utf-8"))
+    email = json_data.get("email")
+    purpose = json_data.get("purpose")
 
+    # 이메일 템플릿
+    template = models.Emailtemplates.objects.filter(purpose=purpose)
+    if not template.exists():
+        response_data = {"success": False, "message": "오류: purpose 값이 잘못되었습니다."}
+        return JsonResponse(response_data, status=500)
+    title = template[0].title
+    certification_number = random.randint(100000, 999999)
+    content = template[0].content.format(certification_number=certification_number)
 
-# 인증번호 DB 저장
-def save_email_auth(email: str, certification_number: int, type: str):
-    try:
-        models.Emailauth.objects.create(
-            email=email, certification_number=certification_number, type=type
-        )
-        return {"success": True}
-    except Exception as e:
-        print(f"Error creating Emailauth instance: {e}")
-        return {"success": False, "message": e}
+    # 이메일 전송
+    is_send = send_email(title, content, email)
+    if not is_send["success"]:
+        response_data = {
+            "success": False,
+            "message": f"이메일 전송에 실패했습니다. 오류 메시지: {is_send['message']}",
+        }
+        return JsonResponse(response_data, status=500)
+
+    # 인증번호 저장
+    is_save = save_email_auth(email, certification_number, purpose)
+    if not is_save["success"]:
+        response_data = {
+            "success": False,
+            "message": f"이메일 인증을 다시 시도해주세요. 오류 메시지: {is_save['message']}",
+        }
+        return JsonResponse(response_data, status=500)
+
+    response_data = {"success": True, "message": "이메일 전송이 성공적으로 완료되었습니다."}
+    return JsonResponse(response_data, status=200)
 
 
 # 인증번호 확인
 def check_certification_number(request):
     email = request.GET.get("email")
     certification_number = request.GET.get("certification_number")
-    type = request.GET.get("type")
+    purpose = request.GET.get("purpose")
 
     # 데이터 누락
-    if email is None or certification_number is None or type is None:
+    if email is None or certification_number is None or purpose is None:
         response_data = {"success": False, "message": "오류: 필수 데이터가 누락되었습니다."}
         return JsonResponse(response_data, status=500)
 
     # 인증번호 확인
-    response_data = is_valid_certification(email, certification_number, type)
+    response_data = is_valid_certification(email, certification_number, purpose)
     return JsonResponse(response_data)
-
-
-# 인증번호 확인 함수
-def is_valid_certification(email: str, certification_number: int, type: str) -> dict:
-    queryset = models.Emailauth.objects.filter(
-        email=email, certification_number=certification_number, type=type
-    )
-
-    if not queryset.exists():
-        return {"success": False, "message": "인증이 실패했습니다. 올바른 인증번호를 입력해주세요."}
-
-    current_time = datetime.now()
-    five_minutes_ago = current_time - timedelta(minutes=5)
-
-    if not queryset.filter(created_datetime__gte=five_minutes_ago).exists():
-        return {"success": False, "message": "시간이 초과하였습니다. 다시 시도해주세요."}
-
-    return {"success": True, "message": "인증이 성공적으로 완료되었습니다."}
