@@ -74,7 +74,7 @@ class Prompttemplates(models.Model):
 class Qnaboard(models.Model):
     board_id = models.AutoField(primary_key=True)
     question_user = models.ForeignKey(
-        "Users", on_delete=models.CASCADE, related_name="answer_user_qnaboard_set"
+        "Users", on_delete=models.CASCADE, related_name="question_user_qnaboard_set"
     )
     question_type = models.ForeignKey("Questiontype", on_delete=models.CASCADE)
     question_title = models.CharField(max_length=30)
@@ -87,10 +87,11 @@ class Qnaboard(models.Model):
         on_delete=models.CASCADE,
         blank=True,
         null=True,
-        related_name="question_admin_qnaboard_set",
+        related_name="answer_admin_qnaboard_set",
     )
     answer_content = models.CharField(max_length=255, blank=True, null=True)
     answer_datetime = models.DateTimeField(blank=True, null=True)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         managed = False
