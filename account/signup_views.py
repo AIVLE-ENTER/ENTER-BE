@@ -10,3 +10,12 @@ def check_id_duplicate(request):
     check_id = request.GET.get("id")
     is_available = not models.Users.objects.filter(user_id=check_id).exists()
     return JsonResponse({"is_available": is_available})
+
+
+# 회사 리스트
+def company_list(request):
+    companys = models.Company.objects.all()
+    company_list = []
+    for company in companys:
+        company_list.append({"company_id": company.company_id, "company_name": company.company_name})
+    return JsonResponse({"company_list": company_list})
