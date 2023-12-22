@@ -4,6 +4,7 @@
 from django.core.mail import EmailMessage
 from datetime import datetime, timedelta
 from enter import models
+import hashlib
 
 
 # 메일 전송
@@ -49,4 +50,23 @@ def is_valid_certification(email: str, certification_number: int, purpose: str) 
     if not queryset.filter(created_datetime__gte=five_minutes_ago).exists():
         return {"success": False, "message": "시간이 초과하였습니다. 다시 시도해주세요."}
 
+    # 인증 완료시 is_verified 값 바꾸기
+    certi = queryset.filter(created_datetime__gte=five_minutes_ago).get()
+    certi.is_verified = True
+
     return {"success": True, "message": "인증이 성공적으로 완료되었습니다."}
+
+
+# sha256 암호화
+def encode_sha256(str: str) -> str:
+    result = ""
+    for s in str:
+        result += hashlib.sha256(s.encode()).hexdigest() + "\n"
+    return result
+
+
+# sha256 복호화
+def decode_sha256(str: str) -> str:
+    for i in range(len(str)):
+        str = str.replace(hashlib.sha256(chr(i).encode()).hexdigest(), chr(i))
+    return str.replace("\n", "")

@@ -109,16 +109,17 @@ class Questiontype(models.Model):
 
 class Users(models.Model):
     user_id = models.CharField(primary_key=True, max_length=20)
-    password = models.CharField(max_length=20)
+    password = models.TextField()
     user_name = models.CharField(max_length=20)
     user_email = models.CharField(max_length=30)
     kakao_id = models.CharField(max_length=255, blank=True, null=True)
     naver_id = models.CharField(max_length=255, blank=True, null=True)
     google_id = models.CharField(max_length=255, blank=True, null=True)
-    role = models.CharField(max_length=5)  # admin: 관리자, user: 일반 사용자
-    register_datetime = models.DateTimeField()
+    role = models.CharField(max_length=5, default="user")  # admin: 관리자, user: 일반 사용자
+    register_datetime = models.DateTimeField(auto_now_add=True)
     user_status = models.IntegerField(default=0)  # 0: 회원, 1: 탈퇴회원
     company = models.ForeignKey(Company, on_delete=models.CASCADE)
+    privacy_agreement = models.BooleanField()  # 0: 미동의, 1: 동의
 
     class Meta:
         managed = False
@@ -131,6 +132,7 @@ class Emailauth(models.Model):
     certification_number = models.IntegerField()
     purpose = models.CharField(max_length=20)
     created_datetime = models.DateTimeField(auto_now_add=True)
+    is_verified = models.BooleanField(default=False)
 
     class Meta:
         managed = False
