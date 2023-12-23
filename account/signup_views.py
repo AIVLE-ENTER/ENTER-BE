@@ -71,8 +71,13 @@ def sign_up(request):
     reg_mail = re.compile(
         r"^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$"
     )
-    queryset = models.Emailauth.objects.filter(email=data["user_email"], purpose="signup").order_by('-auth_id')[0]
-    is_certificate = queryset.is_verified is True and queryset.certification_number == certification_number
+    queryset = models.Emailauth.objects.filter(
+        email=data["user_email"], purpose="signup"
+    ).order_by("-auth_id")[0]
+    is_certificate = (
+        queryset.is_verified is True
+        and queryset.certification_number == certification_number
+    )
     ten_minutes_ago = datetime.now() - timedelta(minutes=10)
     if not reg_mail.match(data["user_email"]):
         errors["email"] = "이메일 형식이 올바르지 않습니다."
