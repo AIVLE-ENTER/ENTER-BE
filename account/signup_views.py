@@ -36,7 +36,7 @@ def sign_up(request):
     json_data = json.loads(request.body.decode("utf-8"))
     company_id = json_data.get("company_id")
     password = json_data.get("password")
-    certification_number = json_data.get("certification_number")
+    certification_number = int(json_data.get("certification_number"))
 
     # 회원가입 데이터
     data = {
@@ -48,7 +48,7 @@ def sign_up(request):
     }
 
     # 유효성 검사
-    status = 500
+    status = 400
     success = False
     message = "오류가 발생했습니다. 다시 시도해주세요."
     errors, user_data = {}, {}
@@ -71,17 +71,14 @@ def sign_up(request):
     reg_mail = re.compile(
         r"^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$"
     )
-    is_certificate = models.Emailauth.objects.filter(
-        email=data["user_email"],
-        certification_number=certification_number,
-        is_verified=True,
-    )
+    queryset = models.Emailauth.objects.filter(email=data["user_email"], purpose="signup").order_by('-auth_id')[0]
+    is_certificate = queryset.is_verified is True and queryset.certification_number == certification_number
     ten_minutes_ago = datetime.now() - timedelta(minutes=10)
     if not reg_mail.match(data["user_email"]):
         errors["email"] = "이메일 형식이 올바르지 않습니다."
-    elif not is_certificate.exists():
+    elif not is_certificate:
         errors["email_auth"] = "이메일 인증이 부적절하게 진행되었습니다. 다시 시도해주세요."
-    elif not is_certificate.filter(created_datetime__gte=ten_minutes_ago):
+    elif queryset.created_datetime < ten_minutes_ago:
         errors["email_auth"] = "이메일 인증 후 시간이 10분이상 초과되었습니다. 다시 시도해주세요."
 
     # 에러가 없으면 회원가입

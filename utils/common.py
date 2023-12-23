@@ -36,23 +36,23 @@ def save_email_auth(email: str, certification_number: int, purpose: str):
 
 
 # 인증번호 확인 함수
-def is_valid_certification(email: str, certification_number: int, purpose: str) -> dict:
-    queryset = models.Emailauth.objects.filter(
-        email=email, certification_number=certification_number, purpose=purpose
-    )
+def is_valid_certification(email: str, input_number: int, purpose: str) -> dict:
+    queryset = models.Emailauth.objects.filter(email=email, purpose=purpose).order_by('-auth_id')[0]
+    print(queryset.auth_id)
+    certification_number = queryset.certification_number
 
-    if not queryset.exists():
+    if certification_number != input_number:
         return {"success": False, "message": "인증이 실패했습니다. 올바른 인증번호를 입력해주세요."}
 
     current_time = datetime.now()
     five_minutes_ago = current_time - timedelta(minutes=5)
 
-    if not queryset.filter(created_datetime__gte=five_minutes_ago).exists():
+    if queryset.created_datetime < five_minutes_ago:
         return {"success": False, "message": "시간이 초과하였습니다. 다시 시도해주세요."}
 
     # 인증 완료시 is_verified 값 바꾸기
-    certi = queryset.filter(created_datetime__gte=five_minutes_ago).get()
-    certi.is_verified = True
+    queryset.is_verified = True
+    queryset.save()
 
     return {"success": True, "message": "인증이 성공적으로 완료되었습니다."}
 
