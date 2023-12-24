@@ -65,3 +65,20 @@ def post_list(request):
             "type_list": type_list,
         }
     )
+
+
+def post_detail(request, post_id):
+    post = Qnaboard.objects.get(board_id=post_id)
+
+    return JsonResponse(
+        {
+            "board_id": post.board_id,
+            "question_type_title": post.question_type.question_type_title,
+            "user_name": post.question_user.user_name,
+            "question_datetime": post.question_datetime,
+            "question_title": post.question_title,
+            "question_content": post.question_content,
+            "question_file_name": post.question_file_name,
+            "question_file_path": post.question_file_path,
+        }
+    )

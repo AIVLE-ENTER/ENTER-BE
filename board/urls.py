@@ -5,4 +5,5 @@ app_name = "board"
 
 urlpatterns = [
     path("", views.post_list),
+    path("<int:post_id>/", views.post_detail),
 ]
