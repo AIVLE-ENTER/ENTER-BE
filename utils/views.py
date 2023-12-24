@@ -50,7 +50,7 @@ def send_certification_number(request):
 # 인증번호 확인
 def check_certification_number(request):
     email = request.GET.get("email")
-    certification_number = request.GET.get("certification_number")
+    certification_number = int(request.GET.get("certification_number"))
     purpose = request.GET.get("purpose")
 
     # 데이터 누락
