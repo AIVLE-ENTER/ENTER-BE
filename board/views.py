@@ -1,9 +1,24 @@
+import os
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from enter.models import Qnaboard, Questiontype
+from enter.models import Qnaboard, Questiontype, Users
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 
 # Create your views here.
+
+# 업로드 하는 파일에 대한 개수, 크기, 확장자 제한
+FILE_COUNT_LIMIT = 3
+# 업로드 하는 파일의 최대 사이즈 제한. 5MB : 5242880(5*1024*1024)
+FILE_SIZE_LIMIT = 5242880
+# 업로드 허용 확장자
+WHITE_LIST_EXT = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+]
 
 
 def post_list(request):
@@ -63,12 +78,15 @@ def post_list(request):
             "keyword": keyword,
             "page": page,
             "type_list": type_list,
-        }
+        },
+        json_dumps_params={"ensure_ascii": False},
     )
 
 
 def post_detail(request, post_id):
-    post = Qnaboard.objects.get(board_id=post_id)
+    # 게시글 상세 페이지
+
+    post = get_object_or_404(Qnaboard, board_id=post_id)
 
     return JsonResponse(
         {
@@ -80,5 +98,30 @@ def post_detail(request, post_id):
             "question_content": post.question_content,
             "question_file_name": post.question_file_name,
             "question_file_path": post.question_file_path,
-        }
+        },
+        json_dumps_params={"ensure_ascii": False},
     )
+
+
+@login_required  # LOGIN_URL 설정 필요
+def post_create(request):
+    # 유저 정보 확인
+    session_user_id = request.session.get("user_id", None)
+    if session_user_id is None:  # 로그인 페이지로 (로그인 페이지 링크로 수정해야함)
+        return redirect()
+    if Users.objects.filter(user_id=session_user_id).exists():
+        user = Users.objects.get(user_id=session_user_id)
+
+    # 게시글 작성
+    if request.method == "POST":
+        new_post = Qnaboard.objects.create(
+            question_user=user,
+            question_type_title=request.POST["question_type_title"],
+            question_title=request.POST["question_title"],
+            question_content=request.POST["question_content"],
+            question_image_file=request.FILES["image"],
+        )
+        return redirect(f"/board/{new_post.board_id}")
+
+    # else:
+    #     return render(request,"") GET 방식일 때 처리 :
