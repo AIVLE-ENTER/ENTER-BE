@@ -6,6 +6,7 @@ from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.views.decorators.csrf import csrf_exempt
 
 # Create your views here.
 
@@ -96,14 +97,14 @@ def post_detail(request, post_id):
             "question_datetime": post.question_datetime,
             "question_title": post.question_title,
             "question_content": post.question_content,
-            "question_file_name": post.question_file_name,
-            "question_file_path": post.question_file_path,
+            "question_image_file": post.question_image_file,
         },
         json_dumps_params={"ensure_ascii": False},
     )
 
 
 @login_required  # LOGIN_URL 설정 필요
+@csrf_exempt
 def post_create(request):
     # 유저 정보 확인
     session_user_id = request.session.get("user_id", None)
@@ -112,11 +113,14 @@ def post_create(request):
     if Users.objects.filter(user_id=session_user_id).exists():
         user = Users.objects.get(user_id=session_user_id)
 
+    question_type_id = request.POST["question_type_id"]
+    question_type = Questiontype.objects.get(question_type_id=question_type_id)
+    
     # 게시글 작성
     if request.method == "POST":
         new_post = Qnaboard.objects.create(
             question_user=user,
-            question_type_title=request.POST["question_type_title"],
+            question_type=question_type,
             question_title=request.POST["question_title"],
             question_content=request.POST["question_content"],
             question_image_file=request.FILES["image"],
@@ -125,3 +129,19 @@ def post_create(request):
 
     # else:
     #     return render(request,"") GET 방식일 때 처리 :
+
+
+def post_delete(request, post_id):
+    
+    #게시글 가져오기
+    post = get_object_or_404(Qnaboard, board_id=post_id)
+    
+    if request.session.get("user_id", None) == post.user.user_id:
+        post.is_deleted = True
+        post.save()
+        msg = {"message": "게시글을 삭제하였습니다."}
+    else:
+        msg = {"message": "작성자만 삭제할 수 있습니다."}
+        
+    return JsonResponse(msg)
+    

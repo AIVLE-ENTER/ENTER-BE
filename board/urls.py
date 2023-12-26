@@ -9,6 +9,8 @@ urlpatterns = [
     path("", views.post_list),
     path("<int:post_id>/", views.post_detail),
     path("create/", views.post_create),
+    path("delete/", views.post_delete),
+    path("<int:post_id>/delete/", views.post_delete),
 ]
 
 # MEDIA_URL로 들어오는 요청에 대해 MEDIA_ROOT 경로를 탐색한다.
