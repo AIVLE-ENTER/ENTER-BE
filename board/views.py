@@ -89,6 +89,11 @@ def post_list(request):
 # 게시글 상세 페이지
 def post_detail(request, post_id):
     post = get_object_or_404(Qnaboard, board_id=post_id)
+    
+    if post.question_image_file:  # 이미지 파일이 있는 경우
+        question_image_url = post.question_image_file.url
+    else:  # 이미지 파일이 없는 경우
+        question_image_url = None
 
     return JsonResponse(
         {
@@ -98,7 +103,7 @@ def post_detail(request, post_id):
             "question_datetime": post.question_datetime,
             "question_title": post.question_title,
             "question_content": post.question_content,
-            "question_image_file": post.question_image_file,
+            "question_image_file": question_image_url,
         },
         json_dumps_params={"ensure_ascii": False},
     )
