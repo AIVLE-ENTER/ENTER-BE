@@ -80,8 +80,8 @@ class Qnaboard(models.Model):
     question_title = models.CharField(max_length=30)
     question_content = models.CharField(max_length=100)
     question_image_file = models.ImageField(null=True, upload_to="", blank=True)
-    question_datetime = models.DateTimeField(auto_now=True)
-    modified_datetime = models.DateTimeField(auto_now_add=True)
+    question_datetime = models.DateTimeField(auto_now_add=True)
+    modified_datetime = models.DateTimeField(auto_now=True)
     answer_admin = models.ForeignKey(
         "Users",
         on_delete=models.CASCADE,
