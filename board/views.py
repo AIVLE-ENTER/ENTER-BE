@@ -88,7 +88,6 @@ def post_list(request):
 
 # 게시글 상세 페이지
 def post_detail(request, post_id):
-
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
     return JsonResponse(
@@ -113,16 +112,15 @@ def post_create(request):
     session_user_id = request.session.get("user_id", None)
     if session_user_id is None:  # 로그인 페이지로 (로그인 페이지 링크로 수정해야함)
         msg = {"message": "로그인을 해주세요."}
-        return JsonResponse(msg) # 프론트에서 redirect 처리
-    
+        return JsonResponse(msg)  # 프론트에서 redirect 처리
+
     if Users.objects.filter(user_id=session_user_id).exists():
         user = Users.objects.get(user_id=session_user_id)
 
     if request.method == "POST":
-        
         question_type_id = request.POST["question_type_id"]
         question_type = Questiontype.objects.get(question_type_id=question_type_id)
-        
+
         new_post = Qnaboard.objects.create(
             question_user=user.user_id,
             question_type=question_type,
@@ -135,22 +133,23 @@ def post_create(request):
 
 # 게시글 삭제
 def post_delete(request, post_id):
-    
     post = get_object_or_404(Qnaboard, board_id=post_id)
-    
+
     if request.session.get("user_id", None) == post.user.user_id:
         post.is_deleted = True
         post.save()
         msg = {"message": "게시글을 삭제하였습니다."}
     else:
         msg = {"message": "작성자만 삭제할 수 있습니다."}
-        
-    return JsonResponse(msg, json_dumps_params={"ensure_ascii": False},)
+
+    return JsonResponse(
+        msg,
+        json_dumps_params={"ensure_ascii": False},
+    )
 
 
 # 게시글 수정 페이지 화면
 def post_update_get(request, post_id):
-    
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
     return JsonResponse(
@@ -170,28 +169,28 @@ def post_update_get(request, post_id):
 # 게시글 DB 수정
 @require_POST
 def post_update_post(request, post_id):
-    
     post = get_object_or_404(Qnaboard, board_id=post_id)
-    
+
     # session_user_id = request.session.get("user_id", None)
     # user = Users.objects.get(user_id=session_user_id)
-    
+
     if request.method == "POST":
-        
         if request.session.get("user_id", None) == post.question_user.user_id:
-            
             question_type_id = request.POST["question_type_id"]
             question_type = Questiontype.objects.get(question_type_id=question_type_id)
 
             post.question_type = question_type
-            post.question_title = request.POST.get('question_title')
-            post.question_content = request.POST.get('question_content')
-            post.question_image_file = request.FILES['image']
+            post.question_title = request.POST.get("question_title")
+            post.question_content = request.POST.get("question_content")
+            post.question_image_file = request.FILES["image"]
 
             post.save()
-            
-            return redirect(f"/board/{post.board_id}") # 수정된 게시글의 상세 페이지로 리다이렉트
-        
+
+            return redirect(f"/board/{post.board_id}")  # 수정된 게시글의 상세 페이지로 리다이렉트
+
         else:
             msg = {"message": "작성자만 수정할 수 있습니다."}
-            return JsonResponse(msg, json_dumps_params={"ensure_ascii": False},)
+            return JsonResponse(
+                msg,
+                json_dumps_params={"ensure_ascii": False},
+            )
