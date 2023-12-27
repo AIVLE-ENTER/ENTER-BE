@@ -8,6 +8,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
+from django.core.exceptions import ObjectDoesNotExist
 
 # Create your views here.
 
@@ -199,3 +200,49 @@ def post_update_post(request, post_id):
                 msg,
                 json_dumps_params={"ensure_ascii": False},
             )
+
+
+# 문의 답변 작성
+@login_required  # 로그인한 사용자만 답변 가능
+@require_POST
+def answer_create(request, post_id):
+    
+    
+    try:
+        session_user_id = request.session.get("user_id", None)
+        user = Users.objects.get(user_id=session_user_id)
+        
+        if request.method == "POST":
+            
+            if user.role == 'admin':
+                post = get_object_or_404(Qnaboard, board_id=post_id)
+                
+                post.answer_content = request.POST.get('answer_content')
+                post.answer_datetime = timezone.now()
+                post.save()
+                
+                return redirect(f"/board/{post.board_id}")
+
+            else:
+                msg = {"message": "관리자만 작성할 수 있습니다."}
+                return JsonResponse(
+                    msg,
+                    json_dumps_params={"ensure_ascii": False},
+                )
+    
+    except ObjectDoesNotExist:
+        redirect('회원가입 페이지url')
+        
+
+# 문의 답변글 상세 페이지
+def answer_detail(request, post_id):
+    post = get_object_or_404(Qnaboard, board_id=post_id)
+    
+    return JsonResponse(
+        {   "answer_title": '[답변]' + post.question_title,
+            "answer_content": post.answer_content,
+            "board_id": post.board_id,
+            "question_type_title": post.question_type.question_type_title,
+        },
+        json_dumps_params={"ensure_ascii": False},
+    )
