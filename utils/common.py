@@ -6,6 +6,7 @@ from datetime import datetime, timedelta
 from enter import models
 import hashlib
 import jwt
+import json
 from pytz import timezone
 from django.conf import settings
 
@@ -90,20 +91,30 @@ def create_token(user_id: str) -> str:
 
 
 # jwt 토큰 검증
-def validate_token(token: str) -> dict:
-    try:
-        decoded = jwt.decode(token, SECRET_PRE, algorithms="HS256")
-    except jwt.ExpiredSignatureError:
-        return {"succes": False, "message": "Expired"}
-    except jwt.InvalidTokenError:
-        return {"succes": False, "message": "Invalid"}
+def validate_token(request) -> (object, dict):
+    auth_header = json.loads(request.headers.get("common"))["Authorization"]
+
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header[len("Bearer ") :]
+        try:
+            decoded = jwt.decode(token, SECRET_PRE, algorithms="HS256")
+        except jwt.ExpiredSignatureError:
+            return None, {"success": False, "message": "유효하지 않은 토큰입니다."}
+        except jwt.InvalidTokenError:
+            return None, {"success": False, "message": "기간이 만료된 토큰입니다."}
+        else:
+            user_id = decoded["user_id"]
+            user_params = {"user_id": user_id, "user_status": 0}
+            if not models.Users.objects.filter(**user_params).exists():
+                return None, {"success": False, "message": "존재하지 않는 아이디입니다."}
+            user = models.Users.objects.get(user_id=user_id)
+            return user, {"success": True, "message": "Succes"}
     else:
-        result = {"succes": True, "message": "Succes", "user_id": decoded["user_id"]}
-        return result
+        return None, {"success": False, "message": "HTTP 헤더 정보가 올바르지 않습니다."}
 
 
 # 마스킹
-def mask_name(name):
+def mask_name(name: str) -> str:
     if len(name) <= 1:
         return "*"
     elif len(name) == 2:
