@@ -6,6 +6,25 @@ from enter import models
 import json
 
 
+# 길이 유효성 검사 (길이 전부 통일)
+def validate_length(validations: list, max_length: int) -> (bool, dict):
+    errors = []
+
+    for target, value in validations:
+        if len(value) > max_length:
+            errors.append(target)
+
+    if errors:
+        response_data = {
+            "success": False,
+            "message": f"오류: 유효성 검사 ({max_length}글자 초과)",
+            "errors": {"validation": errors},
+        }
+        return False, response_data
+    else:
+        return True, {}
+
+
 # 채팅방 리스트
 def chat_window_list(request):
     # 토큰 검증
@@ -56,17 +75,9 @@ def create_chat_window(request):
         return JsonResponse(response_data, status=400)
 
     # 유효성 검사
-    if len(target_object) > 20 or len(title) > 20:
-        errors = []
-        if len(target_object) > 20:
-            errors.append("target")
-        if len(title) > 20:
-            errors.append("title")
-        response_data = {
-            "success": False,
-            "message": "오류: 유효성 검사 (20글자 초과)",
-            "errors": {"validation": errors},
-        }
+    validations = [("target", target_object), ("title", title)]
+    is_validate, response_data = validate_length(validations, 20)
+    if not is_validate:
         return JsonResponse(response_data, status=400)
 
     # 채팅방 create
@@ -76,4 +87,45 @@ def create_chat_window(request):
 
     # 응답
     response_data = {"success": True, "message": "채팅방을 생성하였습니다."}
+    return JsonResponse(response_data, status=200)
+
+
+# 채팅방 수정
+@csrf_exempt
+@require_POST
+def update_chat_window(request):
+    # 토큰 검증
+    user, response = validate_token(request)
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+
+    # 데이터 받아오기
+    json_data = json.loads(request.body.decode("utf-8"))
+    chat_window_id = json_data.get("chat_window_id")
+    target_object = json_data.get("target")
+    title = json_data.get("title")
+
+    # 필수 데이터 누락
+    if chat_window_id is None or target_object is None or title is None:
+        response_data = {"success": False, "message": "오류: 필수 데이터가 누락되었습니다."}
+        return JsonResponse(response_data, status=400)
+
+    # 유효성 검사
+    validations = [("target", target_object), ("title", title)]
+    is_validate, response_data = validate_length(validations, 20)
+    if not is_validate:
+        return JsonResponse(response_data, status=400)
+
+    chat = models.Chatwindow.objects.get(chat_window_id=chat_window_id)
+    # 수정권한
+    if chat.user != user:
+        response_data = {"success": True, "message": "잘못된 요청입니다. (수정 권한은 작성자에게만 있습니다.)"}
+        return JsonResponse(response_data, status=403)
+    # 채팅방 update
+    chat.title = title
+    chat.target_object = target_object
+    chat.save()
+
+    # 응답
+    response_data = {"success": True, "message": "채팅방을 수정하였습니다."}
     return JsonResponse(response_data, status=200)

@@ -7,7 +7,7 @@ urlpatterns = [
     # 채팅창
     path("", views.chat_window_list),
     path("chatWindow/create/", views.create_chat_window),
-    # path("chatWindow/update/", views.update_chat_window),
+    path("chatWindow/update/", views.update_chat_window),
     # path("chatWindow/delete/", views.delete_chat_window),
     # 자주 쓰는 문구
     # path("frequentMessage/", views.frequent_message_list),
