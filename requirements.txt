@@ -3,3 +3,4 @@ mysqlclient
 black
 django-cors-headers
 pillow
+PyJWT
