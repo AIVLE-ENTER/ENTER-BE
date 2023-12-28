@@ -117,7 +117,7 @@ def update_chat_window(request):
         return JsonResponse(response_data, status=400)
 
     chat = models.Chatwindow.objects.get(chat_window_id=chat_window_id)
-    # 수정권한
+    # 수정 권한
     if chat.user != user:
         response_data = {"success": True, "message": "잘못된 요청입니다. (수정 권한은 작성자에게만 있습니다.)"}
         return JsonResponse(response_data, status=403)
@@ -150,7 +150,7 @@ def delete_chat_window(request):
         return JsonResponse(response_data, status=400)
 
     chat = models.Chatwindow.objects.get(chat_window_id=chat_window_id)
-    # 수정권한
+    # 삭제 권한
     if chat.user != user:
         response_data = {"success": True, "message": "잘못된 요청입니다. (삭제 권한은 작성자에게만 있습니다.)"}
         return JsonResponse(response_data, status=403)

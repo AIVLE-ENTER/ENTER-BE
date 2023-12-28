@@ -123,7 +123,7 @@ def update_frequent_message(request):
         return JsonResponse(response_data, status=400)
 
     message = models.Prompttemplates.objects.get(template_id=template_id)
-    # 수정권한
+    # 수정 권한
     if message.user != user:
         response_data = {"success": True, "message": "잘못된 요청입니다. (수정 권한은 작성자에게만 있습니다.)"}
         return JsonResponse(response_data, status=403)
@@ -134,4 +134,36 @@ def update_frequent_message(request):
 
     # 응답
     response_data = {"success": True, "message": "자주쓰는 문구를 수정하였습니다."}
+    return JsonResponse(response_data, status=200)
+
+
+# 자주쓰는 문구 삭제
+@csrf_exempt
+@require_POST
+def delete_frequent_message(request):
+    # 토큰 검증
+    user, response = validate_token(request)
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+
+    # 데이터 받아오기
+    json_data = json.loads(request.body.decode("utf-8"))
+    template_id = json_data.get("template_id")
+
+    # 필수 데이터 누락
+    if template_id is None:
+        response_data = {"success": False, "message": "오류: 필수 데이터가 누락되었습니다."}
+        return JsonResponse(response_data, status=400)
+
+    message = models.Prompttemplates.objects.get(template_id=template_id)
+    # 삭제 권한
+    if message.user != user:
+        response_data = {"success": True, "message": "잘못된 요청입니다. (삭제 권한은 작성자에게만 있습니다.)"}
+        return JsonResponse(response_data, status=403)
+    # 자주쓰는 문구 delete
+    message.is_deleted = True
+    message.save()
+
+    # 응답
+    response_data = {"success": True, "message": "자주쓰는 문구를 삭제하였습니다."}
     return JsonResponse(response_data, status=200)
