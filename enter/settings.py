@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "enter",
     "account",
     "board",
+    "main",
 ]
 
 MIDDLEWARE = [

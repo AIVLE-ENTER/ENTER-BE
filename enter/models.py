@@ -39,6 +39,7 @@ class Chatwindow(models.Model):
     crawling_text = models.CharField(max_length=1000, blank=True, null=True)
     created_datetime = models.DateTimeField(auto_now_add=True)
     modified_datetime = models.DateTimeField(auto_now=True)
+    is_deleted = models.BooleanField(default=False)
 
     class Meta:
         # managed = False
