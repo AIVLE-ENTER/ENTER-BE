@@ -65,7 +65,7 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True # 개발 환경에서 테스트를 위해 사용하거나, 특정한 상황에서만 일시적으로 활성화
+CORS_ALLOW_ALL_ORIGINS = True  # 개발 환경에서 테스트를 위해 사용하거나, 특정한 상황에서만 일시적으로 활성화
 
 ROOT_URLCONF = "enter.urls"
 

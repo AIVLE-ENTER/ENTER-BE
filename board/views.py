@@ -9,6 +9,8 @@ from django.views.decorators.http import require_POST
 from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
+from utils.common import validate_token, mask_name
+from rest_framework import status
 
 # Create your views here.
 
@@ -90,7 +92,7 @@ def post_list(request):
 # 게시글 상세 페이지
 def post_detail(request, post_id):
     post = get_object_or_404(Qnaboard, board_id=post_id)
-    
+
     if post.question_image_file:  # 이미지 파일이 있는 경우
         question_image_url = post.question_image_file.url
     else:  # 이미지 파일이 없는 경우
@@ -111,47 +113,53 @@ def post_detail(request, post_id):
 
 
 # 게시글 작성
-@login_required  # LOGIN_URL 설정 필요
 @csrf_exempt
 def post_create(request):
-    # 유저 정보 확인
-    session_user_id = request.session.get("user_id", None)
-    if session_user_id is None:  # 로그인 페이지로 (로그인 페이지 링크로 수정해야함)
-        msg = {"message": "로그인을 해주세요."}
-        return JsonResponse(msg)  # 프론트에서 redirect 처리
+    user, response = validate_token(request)
 
-    if Users.objects.filter(user_id=session_user_id).exists():
-        user = Users.objects.get(user_id=session_user_id)
+    if not response["success"]:
+        return JsonResponse(response, status=400)
 
     if request.method == "POST":
         question_type_id = request.POST["question_type_id"]
         question_type = Questiontype.objects.get(question_type_id=question_type_id)
 
         new_post = Qnaboard.objects.create(
-            question_user=user.user_id,
+            question_user=user,
             question_type=question_type,
             question_title=request.POST["question_title"],
             question_content=request.POST["question_content"],
             question_image_file=request.FILES["image"],
         )
-        return redirect(f"/board/{new_post.board_id}")
+
+        return JsonResponse(
+            {
+                "success": True,
+                "message": "게시글 작성이 완료되었습니다.",
+                "board_id": new_post.board_id,
+            },
+            status=200,
+        )
 
 
 # 게시글 삭제
 def post_delete(request, post_id):
+    user, response = validate_token(request)
+
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
-    if request.session.get("user_id", None) == post.user.user_id:
+    if user.user_id == post.user.user_id or user.role == "admin":
         post.is_deleted = True
         post.save()
-        msg = {"message": "게시글을 삭제하였습니다."}
-    else:
-        msg = {"message": "작성자만 삭제할 수 있습니다."}
+        return JsonResponse({"success": True, "message": "게시글 삭제 완료"}, status=200)
 
-    return JsonResponse(
-        msg,
-        json_dumps_params={"ensure_ascii": False},
-    )
+    else:
+        return JsonResponse(
+            {"success": False, "message": "게시글 삭제 권한이 없습니다."}, status=403
+        )
 
 
 # 게시글 수정 페이지 화면
@@ -175,74 +183,90 @@ def post_update_get(request, post_id):
 # 게시글 DB 수정
 @require_POST
 def post_update_post(request, post_id):
+    user, response = validate_token(request)
+
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
-    # session_user_id = request.session.get("user_id", None)
-    # user = Users.objects.get(user_id=session_user_id)
+    if user.user_id == post.user.user_id:
+        question_type_id = request.POST["question_type_id"]
+        question_type = Questiontype.objects.get(question_type_id=question_type_id)
+        post.question_type = question_type
+        post.question_title = request.POST.get("question_title")
+        post.question_content = request.POST.get("question_content")
+        post.question_image_file = request.FILES["image"]
 
-    if request.method == "POST":
-        if request.session.get("user_id", None) == post.question_user.user_id:
-            question_type_id = request.POST["question_type_id"]
-            question_type = Questiontype.objects.get(question_type_id=question_type_id)
+        post.save()
 
-            post.question_type = question_type
-            post.question_title = request.POST.get("question_title")
-            post.question_content = request.POST.get("question_content")
-            post.question_image_file = request.FILES["image"]
+        msg = {"message": "수정 하였습니다."}
 
-            post.save()
-
-            return redirect(f"/board/{post.board_id}")  # 수정된 게시글의 상세 페이지로 리다이렉트
-
-        else:
-            msg = {"message": "작성자만 수정할 수 있습니다."}
-            return JsonResponse(
-                msg,
-                json_dumps_params={"ensure_ascii": False},
-            )
+        return JsonResponse(
+            {"success": True, "message": "수정하였습니다."},
+            json_dumps_params={"ensure_ascii": False},
+            status=200,
+        )
 
 
 # 문의 답변 작성
-@login_required  # 로그인한 사용자만 답변 가능
 @require_POST
 def answer_create(request, post_id):
-    
-    
-    try:
-        session_user_id = request.session.get("user_id", None)
-        user = Users.objects.get(user_id=session_user_id)
-        
-        if request.method == "POST":
-            
-            if user.role == 'admin':
-                post = get_object_or_404(Qnaboard, board_id=post_id)
-                
-                post.answer_content = request.POST.get('answer_content')
-                post.answer_datetime = timezone.now()
-                post.save()
-                
-                return redirect(f"/board/{post.board_id}")
+    user, response = validate_token(request)
 
-            else:
-                msg = {"message": "관리자만 작성할 수 있습니다."}
-                return JsonResponse(
-                    msg,
-                    json_dumps_params={"ensure_ascii": False},
-                )
-    
-    except ObjectDoesNotExist:
-        redirect('회원가입 페이지url')
-        
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+
+    if user.role == "admin":
+        post = get_object_or_404(Qnaboard, board_id=post_id)
+
+        post.answer_content = request.POST.get("answer_content")
+        post.answer_datetime = timezone.now()
+        post.save()
+        return JsonResponse(
+            {"success": True, "message": "답변이 작성되었습니다."},
+            json_dumps_params={"ensure_ascii": False},
+            status=200,
+        )
+
+    else:
+        msg = {"message": "관리자만 작성할 수 있습니다."}
+        return JsonResponse(
+            {"success": False, "message": "권한이 없습니다."},
+            json_dumps_params={"ensure_ascii": False},
+            status=403,
+        )
+
 
 # 문의 답변글 상세 페이지
 def answer_detail(request, post_id):
     post = get_object_or_404(Qnaboard, board_id=post_id)
-    
+
     return JsonResponse(
-        {   "answer_title": '[답변]' + post.question_title,
+        {
+            "answer_title": "[답변]" + post.question_title,
             "answer_content": post.answer_content,
             "board_id": post.board_id,
             "question_type_title": post.question_type.question_type_title,
+        },
+        json_dumps_params={"ensure_ascii": False},
+    )
+
+
+# 마이페이지
+def myinfo(request):
+    user, response = validate_token(request)
+
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+
+    return JsonResponse(
+        {
+            "user_id": user.user_id,
+            "password": "*******",
+            "user_name": mask_name(user.user_name),
+            "user_email": user.user_email,
+            "role": user.role,
         },
         json_dumps_params={"ensure_ascii": False},
     )
