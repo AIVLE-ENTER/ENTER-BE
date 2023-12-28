@@ -139,16 +139,16 @@ def delete_chat_window(request):
     user, response = validate_token(request)
     if not response["success"]:
         return JsonResponse(response, status=400)
-    
+
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
     chat_window_id = json_data.get("chat_window_id")
-    
+
     # 필수 데이터 누락
     if chat_window_id is None:
         response_data = {"success": False, "message": "오류: 필수 데이터가 누락되었습니다."}
         return JsonResponse(response_data, status=400)
-    
+
     chat = models.Chatwindow.objects.get(chat_window_id=chat_window_id)
     # 수정권한
     if chat.user != user:
