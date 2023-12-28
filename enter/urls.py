@@ -22,4 +22,5 @@ urlpatterns = [
     path("utils/", include("utils.urls")),
     path("account/", include("account.urls")),
     path("board/", include("board.urls")),
+    path("main/", include("main.urls")),
 ]
