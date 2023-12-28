@@ -103,6 +103,8 @@ DATABASES = {
     }
 }
 
+SECRET_PRE = get_env_variable("SECRET_PRE")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators

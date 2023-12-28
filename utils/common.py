@@ -1,10 +1,14 @@
 # common.py
 # 공통 함수 관리
-
+from django.http import HttpResponse
 from django.core.mail import EmailMessage
 from datetime import datetime, timedelta
 from enter import models
 import hashlib
+import jwt
+from django.conf import settings
+
+SECRET_PRE = settings.SECRET_PRE
 
 
 # 메일 전송
@@ -37,8 +41,9 @@ def save_email_auth(email: str, certification_number: int, purpose: str):
 
 # 인증번호 확인 함수
 def is_valid_certification(email: str, input_number: int, purpose: str) -> dict:
-    queryset = models.Emailauth.objects.filter(email=email, purpose=purpose).order_by('-auth_id')[0]
-    print(queryset.auth_id)
+    queryset = models.Emailauth.objects.filter(email=email, purpose=purpose).order_by(
+        "-auth_id"
+    )[0]
     certification_number = queryset.certification_number
 
     if certification_number != input_number:
@@ -70,3 +75,15 @@ def decode_sha256(str: str) -> str:
     for i in range(len(str)):
         str = str.replace(hashlib.sha256(chr(i).encode()).hexdigest(), chr(i))
     return str.replace("\n", "")
+
+
+# jwt 토큰 검증
+def validate_token(token: str) -> str:
+    try:
+        decoded = jwt.decode(token, SECRET_PRE, algorithms="HS256")
+    except jwt.ExpiredSignatureError:
+        return HttpResponse("Unauthorized", status=401)
+    except jwt.InvalidTokenError:
+        return HttpResponse("Unauthorized", status=401)
+    else:
+        return decoded["user_id"]
