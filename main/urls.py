@@ -3,4 +3,6 @@ from . import views
 
 app_name = "main"
 
-urlpatterns = []
+urlpatterns = [
+    path("", views.chat_window_list),
+]

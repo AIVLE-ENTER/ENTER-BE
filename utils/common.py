@@ -100,9 +100,9 @@ def validate_token(request: HttpRequest) -> (Users, dict):
         try:
             decoded = jwt.decode(token, SECRET_PRE, algorithms="HS256")
         except jwt.ExpiredSignatureError:
-            return None, {"success": False, "message": "유효하지 않은 토큰입니다."}
-        except jwt.InvalidTokenError:
             return None, {"success": False, "message": "기간이 만료된 토큰입니다."}
+        except jwt.InvalidTokenError:
+            return None, {"success": False, "message": "유효하지 않은 토큰입니다."}
         else:
             user_id = decoded["user_id"]
             user_params = {"user_id": user_id, "user_status": 0}
