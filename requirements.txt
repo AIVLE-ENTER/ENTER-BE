@@ -4,3 +4,4 @@ black
 django-cors-headers
 pillow
 PyJWT
+pytz
