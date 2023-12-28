@@ -25,7 +25,8 @@ def sign_in(request):
         return JsonResponse(response_data, status=400)
 
     # 계정 확인 및 로그인
-    if not models.Users.objects.filter(user_id=user_id, password=password).exists():
+    params = {"user_id": user_id, "password": password, "user_status": 0}
+    if not models.Users.objects.filter(**params).exists():
         response_data = {"success": False, "message": "로그인에 실패하였습니다."}
         return JsonResponse(response_data, status=401)
     else:
@@ -53,12 +54,18 @@ def find_id(request):
         return JsonResponse(response_data, status=400)
 
     # 유저 찾기
-    users = models.Users.objects.filter(user_name=user_name, user_email=email)
+    params = {"user_name": user_name, "user_email": "email", "user_status": 0}
+    users = models.Users.objects.filter(**params)
     id_list = [user.user_id for user in users]
 
     # 응답
-    response_data = {"success": True, "message": "아이디 찾기에 성공하였습니다.", "id_list": id_list}
-    return JsonResponse(response_data, status=200)
+    if len(id_list) > 0:
+        response_data = {"success": True, "message": "아이디 찾기에 성공하였습니다.", "id_list": id_list}
+        return JsonResponse(response_data, status=200)
+    else:
+        response_data = {"success": False, "message": "해당하는 계정을 찾을 수 없습니다.", "id_list": id_list}
+        return JsonResponse(response_data, status=400)
+    
 
 
 # 비밀번호 변경
@@ -83,8 +90,9 @@ def chage_password(request):
         return JsonResponse(response_data, status=400)
 
     # 사용자
-    user = models.Users.objects.filter(user_id=user_id)[0]
-    if not models.Users.objects.filter(user_id=user_id).exists():  # 존재하지 않는 아이디
+    user_params = {"user_id": user_id, "user_status": 0}
+    user = models.Users.objects.filter(**user_params)[0]
+    if not models.Users.objects.filter(**user_params).exists():  # 존재하지 않는 아이디
         response_data = {"success": False, "message": "존재하지 않는 아이디 입니다."}
         return JsonResponse(response_data, status=400)
     if email != user.user_email:  # 이메일 일치X
@@ -92,8 +100,8 @@ def chage_password(request):
         return JsonResponse(response_data, status=400)
 
     # 인증번호 관련 - 부적절, 시간초과
-    params = {"email": email, "purpose": "findPW"}
-    auth = models.Emailauth.objects.filter(**params).order_by("-auth_id")[0]
+    auth_params = {"email": email, "purpose": "findPW"}
+    auth = models.Emailauth.objects.filter(**auth_params).order_by("-auth_id")[0]
     is_certificate = (
         auth.is_verified is True and auth.certification_number == certification_number
     )
@@ -116,4 +124,31 @@ def chage_password(request):
     user.save()
 
     response_data = {"success": True, "message": "비밀번호 변경에 성공하였습니다."}
+    return JsonResponse(response_data, status=200)
+
+
+# 회원 탈퇴
+@csrf_exempt
+@require_POST
+def sign_out(request):
+    # 데이터 받아오기
+    json_data = json.loads(request.body.decode("utf-8"))
+    user_id = json_data.get("user_id")
+    password = json_data.get("password")
+    
+    # 사용자 확인
+    user_params = {"user_id": user_id, "user_status": 0}
+    user = models.Users.objects.filter(**user_params)[0]
+    if not models.Users.objects.filter(**user_params).exists():
+        response_data = {"success": False, "message": "존재하지 않는 아이디입니다."}
+        return JsonResponse(response_data, status=400)
+    
+    if user.password != encode_sha256(password):
+        response_data = {"success": False, "message": "비밀번호가 일치하지 않습니다."}
+        return JsonResponse(response_data, status=400)
+    
+    # 탈퇴
+    user.user_status = 1
+    user.save()
+    response_data = {"success": True, "message": "회원 탈퇴에 성공하였습니다."}
     return JsonResponse(response_data, status=200)

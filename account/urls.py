@@ -12,6 +12,6 @@ urlpatterns = [
     path("auth/signIn/", auth_views.sign_in, name="sign-in"),
     path("auth/findID/", auth_views.find_id, name="find-id"),
     path("auth/changePassword/", auth_views.chage_password, name="chage-password"),
-    # path("auth/signOut/", auth_views.sign_out, name="sign-out"),
+    path("auth/signOut/", auth_views.sign_out, name="sign-out"),
     # social_views.py (소셜 연동)
 ]
