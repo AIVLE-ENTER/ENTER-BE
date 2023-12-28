@@ -54,9 +54,11 @@ def find_id(request):
         return JsonResponse(response_data, status=400)
 
     # 유저 찾기
-    params = {"user_name": user_name, "user_email": "email", "user_status": 0}
+    params = {"user_name": user_name, "user_email": email, "user_status": 0}
     users = models.Users.objects.filter(**params)
     id_list = [user.user_id for user in users]
+    
+    print(id_list)
 
     # 응답
     if len(id_list) > 0:
