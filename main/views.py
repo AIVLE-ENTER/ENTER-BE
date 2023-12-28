@@ -129,3 +129,35 @@ def update_chat_window(request):
     # 응답
     response_data = {"success": True, "message": "채팅방을 수정하였습니다."}
     return JsonResponse(response_data, status=200)
+
+
+# 채팅방 삭제
+@csrf_exempt
+@require_POST
+def delete_chat_window(request):
+    # 토큰 검증
+    user, response = validate_token(request)
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+    
+    # 데이터 받아오기
+    json_data = json.loads(request.body.decode("utf-8"))
+    chat_window_id = json_data.get("chat_window_id")
+    
+    # 필수 데이터 누락
+    if chat_window_id is None:
+        response_data = {"success": False, "message": "오류: 필수 데이터가 누락되었습니다."}
+        return JsonResponse(response_data, status=400)
+    
+    chat = models.Chatwindow.objects.get(chat_window_id=chat_window_id)
+    # 수정권한
+    if chat.user != user:
+        response_data = {"success": True, "message": "잘못된 요청입니다. (삭제 권한은 작성자에게만 있습니다.)"}
+        return JsonResponse(response_data, status=403)
+    # 채팅방 delete
+    chat.is_deleted = True
+    chat.save()
+
+    # 응답
+    response_data = {"success": True, "message": "채팅방을 삭제하였습니다."}
+    return JsonResponse(response_data, status=200)
