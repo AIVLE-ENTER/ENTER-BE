@@ -12,6 +12,6 @@ urlpatterns = [
     # 자주 쓰는 문구
     path("frequentMessage/", message_views.frequent_message_list),
     path("frequentMessage/create/", message_views.create_frequent_message),
-    # path("frequentMessage/update/", message_views.update_frequent_message),
+    path("frequentMessage/update/", message_views.update_frequent_message),
     # path("frequentMessage/delete/", message_views.delete_frequent_message),
 ]
