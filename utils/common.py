@@ -1,9 +1,10 @@
 # common.py
 # 공통 함수 관리
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 from django.core.mail import EmailMessage
 from datetime import datetime, timedelta
 from enter import models
+from enter.models import Users
 import hashlib
 import jwt
 import json
@@ -91,7 +92,7 @@ def create_token(user_id: str) -> str:
 
 
 # jwt 토큰 검증
-def validate_token(request) -> (object, dict):
+def validate_token(request: HttpRequest) -> (Users, dict):
     auth_header = json.loads(request.headers.get("common"))["Authorization"]
 
     if auth_header and auth_header.startswith("Bearer "):
@@ -107,8 +108,8 @@ def validate_token(request) -> (object, dict):
             user_params = {"user_id": user_id, "user_status": 0}
             if not models.Users.objects.filter(**user_params).exists():
                 return None, {"success": False, "message": "존재하지 않는 아이디입니다."}
-            user = models.Users.objects.get(user_id=user_id)
-            return user, {"success": True, "message": "Succes"}
+            user_instance = models.Users.objects.get(user_id=user_id)
+            return user_instance, {"success": True, "message": "Succes"}
     else:
         return None, {"success": False, "message": "HTTP 헤더 정보가 올바르지 않습니다."}
 
