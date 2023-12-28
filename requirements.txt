@@ -2,3 +2,4 @@ Django
 mysqlclient
 black
 django-cors-headers
+pillow

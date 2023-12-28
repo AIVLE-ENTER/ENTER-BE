@@ -65,6 +65,8 @@ MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
 ]
 
+CORS_ALLOW_ALL_ORIGINS = True # 개발 환경에서 테스트를 위해 사용하거나, 특정한 상황에서만 일시적으로 활성화
+
 ROOT_URLCONF = "enter.urls"
 
 TEMPLATES = [
@@ -155,3 +157,7 @@ EMAIL_HOST_USER = get_env_variable("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = get_env_variable("EMAIL_HOST_PASSWORD")
 EMAIL_USE_TLS = True
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"

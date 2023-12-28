@@ -10,7 +10,7 @@ class Analysismemo(models.Model):
     is_deleted = models.IntegerField(default=0)  # 삭제여부 (0: 유지, 1: 삭제)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "AnalysisMemo"
 
 
@@ -27,7 +27,7 @@ class Analysisresults(models.Model):
     )  # 메모사용여부 (0: 미사용, 1: 사용)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "AnalysisResults"
 
 
@@ -41,7 +41,7 @@ class Chatwindow(models.Model):
     modified_datetime = models.DateTimeField(auto_now=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "ChatWindow"
 
 
@@ -53,7 +53,7 @@ class Company(models.Model):
     tot_sales = models.IntegerField(blank=True, null=True)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "Company"
 
 
@@ -67,7 +67,7 @@ class Prompttemplates(models.Model):
     is_deleted = models.IntegerField(default=0)  # 삭제여부 (0: 유지, 1: 삭제)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "PromptTemplates"
 
 
@@ -79,9 +79,9 @@ class Qnaboard(models.Model):
     question_type = models.ForeignKey("Questiontype", on_delete=models.CASCADE)
     question_title = models.CharField(max_length=30)
     question_content = models.CharField(max_length=100)
-    question_file_name = models.CharField(max_length=255, blank=True, null=True)
-    question_file_path = models.CharField(max_length=255, blank=True, null=True)
-    question_datetime = models.DateTimeField()
+    question_image_file = models.ImageField(null=True, upload_to="", blank=True)
+    question_datetime = models.DateTimeField(auto_now_add=True)
+    modified_datetime = models.DateTimeField(auto_now=True)
     answer_admin = models.ForeignKey(
         "Users",
         on_delete=models.CASCADE,
@@ -94,7 +94,7 @@ class Qnaboard(models.Model):
     is_deleted = models.BooleanField(default=False)
 
     class Meta:
-        managed = False
+        # managed = True
         db_table = "QnABoard"
 
 
@@ -104,7 +104,7 @@ class Questiontype(models.Model):
     question_type_content = models.CharField(max_length=20)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "QuestionType"
 
 
@@ -123,7 +123,7 @@ class Users(models.Model):
     privacy_agreement = models.BooleanField()  # 0: 미동의, 1: 동의
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "Users"
 
 
@@ -136,7 +136,7 @@ class Emailauth(models.Model):
     is_verified = models.BooleanField(default=False)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "EmailAuth"
 
 
@@ -146,5 +146,5 @@ class Emailtemplates(models.Model):
     purpose = models.CharField(unique=True, max_length=20)
 
     class Meta:
-        managed = False
+        # managed = False
         db_table = "EmailTemplates"
