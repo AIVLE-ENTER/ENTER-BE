@@ -90,12 +90,23 @@ def create_token(user_id: str) -> str:
 
 
 # jwt 토큰 검증
-def validate_token(token: str) -> str:
+def validate_token(token: str) -> dict:
     try:
         decoded = jwt.decode(token, SECRET_PRE, algorithms="HS256")
     except jwt.ExpiredSignatureError:
-        return HttpResponse("Unauthorized", status=401)
+        return {"succes": False, "message": "Expired"}
     except jwt.InvalidTokenError:
-        return HttpResponse("Unauthorized", status=401)
+        return {"succes": False, "message": "Invalid"}
     else:
-        return decoded["user_id"]
+        result = {"succes": True, "message": "Succes", "user_id": decoded["user_id"]}
+        return result
+
+
+# 마스킹
+def mask_name(name):
+    if len(name) <= 1:
+        return "*"
+    elif len(name) == 2:
+        return name[0] + "*"
+    else:
+        return name[0] + "*" + name[2:]

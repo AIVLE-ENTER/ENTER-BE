@@ -5,7 +5,7 @@ from enter import models
 import json
 from utils.common import encode_sha256
 from django.conf import settings
-from utils.common import create_token, validate_token
+from utils.common import create_token, validate_token, mask_name
 from datetime import datetime, timedelta
 import re
 
@@ -57,8 +57,6 @@ def find_id(request):
     params = {"user_name": user_name, "user_email": email, "user_status": 0}
     users = models.Users.objects.filter(**params)
     id_list = [user.user_id for user in users]
-    
-    print(id_list)
 
     # 응답
     if len(id_list) > 0:
@@ -160,3 +158,43 @@ def sign_out(request):
     user.save()
     response_data = {"success": True, "message": "회원 탈퇴에 성공하였습니다."}
     return JsonResponse(response_data, status=200)
+
+
+# 사용자 정보
+def user_info(request):
+    # 헤더에서 토큰 받아오기
+    auth_header = json.loads(request.headers.get("common"))["Authorization"]
+    if auth_header and auth_header.startswith("Bearer "):
+        token = auth_header[len("Bearer ") :]
+        user_data = validate_token(token)
+
+        # 토큰 부적격
+        if not user_data["succes"]:
+            if user_data["message"] == "Invalid":
+                response_data = {"success": False, "message": "유효하지 않은 토큰입니다."}
+                return JsonResponse(response_data, status=400)
+            elif user_data["message"] == "Expired":
+                response_data = {"success": False, "message": "기간이 만료된 토큰입니다."}
+                return JsonResponse(response_data, status=400)
+
+        # 존재하지 않는 아이디
+        user_params = {"user_id": user_data["user_id"], "user_status": 0}
+        if not models.Users.objects.filter(**user_params).exists():
+            response_data = {"success": False, "message": "존재하지 않는 아이디입니다."}
+            return JsonResponse(response_data, status=400)
+
+        # 유저 정보
+        user = models.Users.objects.filter(**user_params)[0]
+        response_data = {
+            "success": True,
+            "message": "유저 정보 받기에 성공하였습니다.",
+            "data": {
+                "user_id": user.user_id,
+                "user_name": mask_name(user.user_name),
+                "role": user.role,
+            },
+        }
+        return JsonResponse(response_data, status=200)
+    else:
+        response_data = {"success": False, "message": "HTTP 헤더 정보가 올바르지 않습니다."}
+        return JsonResponse(response_data, status=400)
