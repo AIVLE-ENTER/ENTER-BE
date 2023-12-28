@@ -3,25 +3,9 @@ from django.views.decorators.http import require_POST
 from django.http import JsonResponse
 from enter import models
 import json
-import jwt
-from pytz import timezone
-import datetime
 from utils.common import encode_sha256
 from django.conf import settings
-from utils.common import validate_token
-
-SECRET_PRE = settings.SECRET_PRE
-
-
-# jwt 토큰 생성
-def create_token(user_id: str) -> str:
-    data = {
-        "exp": datetime.datetime.now(timezone("Asia/Seoul"))
-        + datetime.timedelta(seconds=60 * 60 * 24),  # 24시간
-        "user_id": user_id,
-    }
-    token = jwt.encode(data, SECRET_PRE, algorithm="HS256")
-    return token
+from utils.common import create_token, validate_token
 
 
 # 로그인
@@ -45,3 +29,21 @@ def sign_in(request):
             "data": {"user_id": user_id, "token": token},
         }
         return JsonResponse(response_data, status=200)
+
+
+# 아이디 찾기
+@csrf_exempt
+@require_POST
+def find_id(request):
+    # 데이터 받아오기
+    json_data = json.loads(request.body.decode("utf-8"))
+    user_name = json_data.get("user_name")
+    email = json_data.get("email")
+
+    # 유저 찾기
+    users = models.Users.objects.filter(user_name=user_name, user_email=email)
+    id_list = [user.user_id for user in users]
+
+    # 응답
+    response_data = {"success": True, "message": "아이디 찾기에 성공하였습니다.", "id_list": id_list}
+    return JsonResponse(response_data, status=200)

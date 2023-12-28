@@ -10,5 +10,6 @@ urlpatterns = [
     path("signUp/", signup_views.sign_up, name="sign-up"),
     # auth_views.py (로그인, 아이디/비번 찾기, 회원 탈퇴)
     path("auth/signIn/", auth_views.sign_in, name="sign-in"),
+    path("auth/findID/", auth_views.find_id, name="find-id"),
     # social_views.py (소셜 연동)
 ]
