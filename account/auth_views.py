@@ -60,12 +60,19 @@ def find_id(request):
 
     # 응답
     if len(id_list) > 0:
-        response_data = {"success": True, "message": "아이디 찾기에 성공하였습니다.", "id_list": id_list}
+        response_data = {
+            "success": True,
+            "message": "아이디 찾기에 성공하였습니다.",
+            "id_list": id_list,
+        }
         return JsonResponse(response_data, status=200)
     else:
-        response_data = {"success": False, "message": "해당하는 계정을 찾을 수 없습니다.", "id_list": id_list}
+        response_data = {
+            "success": False,
+            "message": "해당하는 계정을 찾을 수 없습니다.",
+            "id_list": id_list,
+        }
         return JsonResponse(response_data, status=400)
-    
 
 
 # 비밀번호 변경
@@ -91,10 +98,10 @@ def chage_password(request):
 
     # 사용자
     user_params = {"user_id": user_id, "user_status": 0}
-    user = models.Users.objects.filter(**user_params)[0]
     if not models.Users.objects.filter(**user_params).exists():  # 존재하지 않는 아이디
         response_data = {"success": False, "message": "존재하지 않는 아이디 입니다."}
         return JsonResponse(response_data, status=400)
+    user = models.Users.objects.filter(**user_params)[0]
     if email != user.user_email:  # 이메일 일치X
         response_data = {"success": False, "message": "이메일이 일치하지 않습니다."}
         return JsonResponse(response_data, status=400)
@@ -135,18 +142,17 @@ def sign_out(request):
     json_data = json.loads(request.body.decode("utf-8"))
     user_id = json_data.get("user_id")
     password = json_data.get("password")
-    
+
     # 사용자 확인
     user_params = {"user_id": user_id, "user_status": 0}
-    user = models.Users.objects.filter(**user_params)[0]
     if not models.Users.objects.filter(**user_params).exists():
         response_data = {"success": False, "message": "존재하지 않는 아이디입니다."}
         return JsonResponse(response_data, status=400)
-    
+    user = models.Users.objects.filter(**user_params)[0]
     if user.password != encode_sha256(password):
         response_data = {"success": False, "message": "비밀번호가 일치하지 않습니다."}
         return JsonResponse(response_data, status=400)
-    
+
     # 탈퇴
     user.user_status = 1
     user.save()
