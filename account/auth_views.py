@@ -8,6 +8,7 @@ from pytz import timezone
 import datetime
 from utils.common import encode_sha256
 from django.conf import settings
+from utils.common import validate_token
 
 SECRET_PRE = settings.SECRET_PRE
 
@@ -16,7 +17,7 @@ SECRET_PRE = settings.SECRET_PRE
 def create_token(user_id: str) -> str:
     data = {
         "exp": datetime.datetime.now(timezone("Asia/Seoul"))
-        + datetime.timedelta(seconds=300),
+        + datetime.timedelta(seconds=60 * 60 * 24),  # 24시간
         "user_id": user_id,
     }
     token = jwt.encode(data, SECRET_PRE, algorithm="HS256")
@@ -26,7 +27,7 @@ def create_token(user_id: str) -> str:
 # 로그인
 @csrf_exempt
 @require_POST
-def login(request):
+def sign_in(request):
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
     user_id = json_data.get("user_id")
