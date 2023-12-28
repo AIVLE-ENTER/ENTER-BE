@@ -7,7 +7,6 @@ from enter import models
 import hashlib
 import jwt
 from pytz import timezone
-import datetime
 from django.conf import settings
 
 SECRET_PRE = settings.SECRET_PRE
@@ -82,8 +81,8 @@ def decode_sha256(str: str) -> str:
 # jwt 토큰 생성
 def create_token(user_id: str) -> str:
     data = {
-        "exp": datetime.datetime.now(timezone("Asia/Seoul"))
-        + datetime.timedelta(seconds=60 * 60 * 24),  # 24시간
+        "exp": datetime.now(timezone("Asia/Seoul"))
+        + timedelta(seconds=60 * 60 * 24),  # 24시간
         "user_id": user_id,
     }
     token = jwt.encode(data, SECRET_PRE, algorithm="HS256")
