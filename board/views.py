@@ -10,7 +10,6 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from utils.common import validate_token, mask_name
-from rest_framework import status
 
 # Create your views here.
 
