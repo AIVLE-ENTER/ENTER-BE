@@ -17,7 +17,7 @@ def validate_length(validations: list, max_length: int) -> (bool, dict):
     if errors:
         response_data = {
             "success": False,
-            "message": f"오류: 유효성 검사 ({max_length}글자 초과)",
+            "message": f"{max_length}글자 이내로 입력해주세요.",
             "errors": {"validation": errors},
         }
         return False, response_data
@@ -58,7 +58,7 @@ def chat_window_list(request):
 # 채팅방 생성
 @csrf_exempt
 @require_POST
-def create_chat_window(request):
+def create_chat_window(request):    
     # 토큰 검증
     user, response = validate_token(request)
     if not response["success"]:
@@ -78,6 +78,12 @@ def create_chat_window(request):
     validations = [("target", target_object), ("title", title)]
     is_validate, response_data = validate_length(validations, 20)
     if not is_validate:
+        return JsonResponse(response_data, status=400)
+    
+    # target 중복 체크
+    chat_params = {"target_object": target_object, "user": user}
+    if models.Chatwindow.objects.filter(**chat_params).exists():
+        response_data = {"success": False, "message": "중복된 주제입니다."}
         return JsonResponse(response_data, status=400)
 
     # 채팅방 create
@@ -102,18 +108,16 @@ def update_chat_window(request):
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
     chat_window_id = json_data.get("chat_window_id")
-    target_object = json_data.get("target")
     title = json_data.get("title")
 
     # 필수 데이터 누락
-    if chat_window_id is None or target_object is None or title is None:
+    if chat_window_id is None or title is None:
         response_data = {"success": False, "message": "오류: 필수 데이터가 누락되었습니다."}
         return JsonResponse(response_data, status=400)
 
     # 유효성 검사
-    validations = [("target", target_object), ("title", title)]
-    is_validate, response_data = validate_length(validations, 20)
-    if not is_validate:
+    if len(title) > 20:
+        response_data = {"success": False, "message": "20글자 이내로 입력해주세요."}
         return JsonResponse(response_data, status=400)
 
     chat = models.Chatwindow.objects.get(chat_window_id=chat_window_id)
@@ -123,7 +127,6 @@ def update_chat_window(request):
         return JsonResponse(response_data, status=403)
     # 채팅방 update
     chat.title = title
-    chat.target_object = target_object
     chat.save()
 
     # 응답
