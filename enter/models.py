@@ -61,8 +61,8 @@ class Company(models.Model):
 class Prompttemplates(models.Model):
     template_id = models.AutoField(primary_key=True)
     user = models.ForeignKey("Users", on_delete=models.CASCADE)
-    template_name = models.CharField(max_length=30)
-    template_content = models.CharField(max_length=100)
+    template_name = models.CharField(max_length=100)
+    template_content = models.TextField()
     created_datetime = models.DateTimeField(auto_now_add=True)
     modified_datetime = models.DateTimeField(auto_now=True)
     is_deleted = models.IntegerField(default=0)  # 삭제여부 (0: 유지, 1: 삭제)
