@@ -2,6 +2,7 @@ from pathlib import Path
 import os
 import json
 from django.core.exceptions import ImproperlyConfigured
+from corsheaders.defaults import default_headers
 
 # BASE 폴더
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -162,3 +163,9 @@ DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 MEDIA_URL = "/media/"
 
 MEDIA_ROOT = BASE_DIR / "media"
+
+
+# 특정 헤더를 허용하려면
+CORS_ALLOW_HEADERS = list(default_headers) + [
+    'Your-Custom-Header',
+]
