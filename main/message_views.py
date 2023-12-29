@@ -56,7 +56,10 @@ def create_frequent_message(request):
 
     # 유효성 검사
     if template_content > 100:
-        response_data = {"success": False, "message": "오류: template_content는 100글자를 넘을 수 없습니다."}
+        response_data = {
+            "success": False,
+            "message": "오류: template_content는 100글자를 넘을 수 없습니다.",
+        }
         return JsonResponse(response_data, status=400)
 
     # 자주쓰는 문구 create
@@ -91,7 +94,10 @@ def update_frequent_message(request):
 
     # 유효성 검사
     if template_content > 100:
-        response_data = {"success": False, "message": "오류: template_content는 100글자를 넘을 수 없습니다."}
+        response_data = {
+            "success": False,
+            "message": "오류: template_content는 100글자를 넘을 수 없습니다.",
+        }
         return JsonResponse(response_data, status=400)
 
     message = models.Prompttemplates.objects.get(template_id=template_id)
