@@ -6,26 +6,6 @@ from enter import models
 import json
 
 
-# 길이 유효성 검사
-def validate_length(validations: list, max_length: list) -> (bool, dict):
-    errors = []
-    i = 0
-    for target, value in validations:
-        if len(value) > max_length[i]:
-            errors.append(target)
-        i += 1
-
-    if errors:
-        response_data = {
-            "success": False,
-            "message": "오류: 유효성 검사 (길이)",
-            "errors": {"validation": errors},
-        }
-        return False, response_data
-    else:
-        return True, {}
-
-
 # 자주쓰는 문구 리스트
 def frequent_message_list(request):
     # 토큰 검증
@@ -75,12 +55,8 @@ def create_frequent_message(request):
         return JsonResponse(response_data, status=400)
 
     # 유효성 검사
-    validations = [
-        ("template_name", template_name),
-        ("template_content", template_content),
-    ]
-    is_validate, response_data = validate_length(validations, [30, 100])
-    if not is_validate:
+    if template_content > 100:
+        response_data = {"success": False, "message": "오류: template_content는 100글자를 넘을 수 없습니다."}
         return JsonResponse(response_data, status=400)
 
     # 자주쓰는 문구 create
@@ -114,12 +90,8 @@ def update_frequent_message(request):
         return JsonResponse(response_data, status=400)
 
     # 유효성 검사
-    validations = [
-        ("template_name", template_name),
-        ("template_content", template_content),
-    ]
-    is_validate, response_data = validate_length(validations, [30, 100])
-    if not is_validate:
+    if template_content > 100:
+        response_data = {"success": False, "message": "오류: template_content는 100글자를 넘을 수 없습니다."}
         return JsonResponse(response_data, status=400)
 
     message = models.Prompttemplates.objects.get(template_id=template_id)
