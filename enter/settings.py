@@ -167,5 +167,5 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 # 특정 헤더를 허용하려면
 CORS_ALLOW_HEADERS = list(default_headers) + [
-    'Your-Custom-Header',
+    "Authorization",
 ]
