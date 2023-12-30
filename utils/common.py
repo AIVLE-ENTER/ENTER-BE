@@ -84,7 +84,7 @@ def decode_sha256(str: str) -> str:
 def create_token(user_id: str) -> str:
     data = {
         "exp": datetime.now(timezone("Asia/Seoul"))
-        + timedelta(seconds=60 * 60 * 24),  # 24시간
+        + timedelta(seconds=60 * 60 * 12),  # 12시간
         "user_id": user_id,
     }
     token = jwt.encode(data, SECRET_PRE, algorithm="HS256")
