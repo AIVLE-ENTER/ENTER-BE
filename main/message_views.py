@@ -55,10 +55,10 @@ def create_frequent_message(request):
         return JsonResponse(response_data, status=400)
 
     # 유효성 검사
-    if template_content > 100:
+    if len(template_name) > 100:
         response_data = {
             "success": False,
-            "message": "오류: template_content는 100글자를 넘을 수 없습니다.",
+            "message": "오류: template_name은 100글자를 넘을 수 없습니다.",
         }
         return JsonResponse(response_data, status=400)
 
