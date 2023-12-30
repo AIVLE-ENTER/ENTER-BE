@@ -3,11 +3,10 @@ from django.db import models
 
 class Analysismemo(models.Model):
     memo_id = models.AutoField(primary_key=True)
-    analysis = models.ForeignKey("Analysisresults", on_delete=models.CASCADE)
-    memo_content = models.CharField(max_length=255)
+    memo_content = models.CharField(max_length=700)
     created_datetime = models.DateTimeField(auto_now_add=True)
     modified_datetime = models.DateTimeField(auto_now=True)
-    is_deleted = models.IntegerField(default=0)  # 삭제여부 (0: 유지, 1: 삭제)
+    user = models.ForeignKey("Users", on_delete=models.CASCADE)
 
     class Meta:
         # managed = False

@@ -10,6 +10,7 @@ from django.utils import timezone
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from utils.common import validate_token, mask_name
+import json
 
 # Create your views here.
 
@@ -99,6 +100,7 @@ def post_detail(request, post_id):
 
     return JsonResponse(
         {
+            "success": True,
             "board_id": post.board_id,
             "question_type_title": post.question_type.question_type_title,
             "user_name": post.question_user.user_name,
@@ -198,8 +200,6 @@ def post_update_post(request, post_id):
         post.question_image_file = request.FILES["image"]
 
         post.save()
-
-        msg = {"message": "수정 하였습니다."}
 
         return JsonResponse(
             {"success": True, "message": "수정하였습니다."},

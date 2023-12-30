@@ -1,5 +1,5 @@
 from django.urls import path
-from . import chat_views, message_views
+from . import chat_views, message_views, memo_views
 
 app_name = "main"
 
@@ -14,4 +14,9 @@ urlpatterns = [
     path("frequentMessage/create/", message_views.create_frequent_message),
     path("frequentMessage/update/", message_views.update_frequent_message),
     path("frequentMessage/delete/", message_views.delete_frequent_message),
+    # 프롬프트 질문 메모
+    path("memo/detail/", memo_views.memo_detail),
+    path("memo/create/", memo_views.memo_create),
+    path("memo/update/", memo_views.memo_update),
+    path("memo/delete/", memo_views.memo_delete),
 ]
