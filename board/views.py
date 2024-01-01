@@ -53,7 +53,7 @@ def post_list(request):
 
     # 페이지 처리
     page = request.GET.get("page", 1)  # 기본값 1
-    paginator = Paginator(posts, 3)  # 한 페이지에 보여질 게시물 수 설정
+    paginator = Paginator(posts, 10)  # 한 페이지에 보여질 게시물 수 설정
 
     try:
         posts = paginator.page(page)
