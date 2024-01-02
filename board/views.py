@@ -124,7 +124,9 @@ def post_detail(request, post_id):
             "question_datetime": post.question_datetime,
             "question_title": post.question_title,
             "question_content": post.question_content,
-            "question_image_file": ("http://localhost:8000/board" + question_image_url) if question_image_url else None,
+            "question_image_file": ("http://localhost:8000/board" + question_image_url)
+            if question_image_url
+            else None,
         },
         json_dumps_params={"ensure_ascii": False},
     )

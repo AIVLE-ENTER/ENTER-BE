@@ -16,20 +16,21 @@ def memo_detail(request):
 
     memo_id = request.GET.get("memo_id")
     memo = Analysismemo.objects.filter(memo_id=memo_id)
-
+    memo_info = {}
+    if memo.exists():
+        memo_info["memo_id "] = memo[0].memo_id
+        memo_info["memo_content "] = memo[0].memo_content
+        memo_info["created_datetime "] = memo[0].created_datetime
+        memo_info["modified_datetime "] = memo[0].modified_datetime
+        memo_info["user_id "] = user.user_id
+    
     return JsonResponse(
         {
             "success": True,
             "message": "메모를 불러왔습니다.",
             "data": {
                 "is_memo": memo.exists(),  # 메모 존재시:True, 미존재시:False
-                "memo": {
-                    "memo_id": memo[0].memo_id,
-                    "memo_content": memo[0].memo_content,
-                    "created_datetime": memo[0].created_datetime,
-                    "modified_datetime": memo[0].modified_datetime,
-                    "user_id": user.user_id,
-                },
+                "memo": memo_info
             },
         },
         status=200,
