@@ -11,6 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from utils.common import validate_token, mask_name
 import json
+from urllib.parse import quote
 
 # Create your views here.
 
@@ -108,6 +109,7 @@ def post_detail(request, post_id):
 
     if post.question_image_file:  # 이미지 파일이 있는 경우
         question_image_url = post.question_image_file.url
+        question_image_url_encoded = quote(question_image_url, safe=':/') # 이미지 파일 한글 이름 인코딩  
     else:  # 이미지 파일이 없는 경우
         question_image_url = None
 
@@ -120,7 +122,7 @@ def post_detail(request, post_id):
             "question_datetime": post.question_datetime,
             "question_title": post.question_title,
             "question_content": post.question_content,
-            "question_image_file": question_image_url,
+            "question_image_file": "http://localhost:8000/board" + question_image_url_encoded,
         },
         json_dumps_params={"ensure_ascii": False},
     )
