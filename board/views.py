@@ -1,7 +1,7 @@
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
-from enter.models import Qnaboard, Questiontype, Users
+from enter.models import Qnaboard, Questiontype
 from django.db.models import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.contrib.auth.decorators import login_required
@@ -24,6 +24,19 @@ WHITE_LIST_EXT = [
     ".jpeg",
     ".png",
 ]
+
+
+# Question Type 리스트
+def question_type_list(request):
+    types = Questiontype.objects.all()
+    type_list = []
+    for type in types:
+        type_info = {
+            "question_type_id": type.question_type_id,
+            "question_type_ntitle": type.question_type_title,
+        }
+        type_list.append(type_info)
+    return JsonResponse({"type_list": type_list})
 
 
 # 게시판 게시글 목록

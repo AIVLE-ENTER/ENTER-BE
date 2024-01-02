@@ -7,6 +7,7 @@ app_name = "board"
 
 urlpatterns = [
     path("", views.post_list),  # 게시판에서 게시글 목록
+    path("questionTypeList/", views.question_type_list),  # 질문 타입 목록
     path("<int:post_id>/", views.post_detail),  # 게시글 상세 페이지
     path("create/", views.post_create),  # 게시판에서 '글쓰기' 버튼 클릭 시
     path("<int:post_id>/delete/", views.post_delete),  # 게시글 상세 페이지에서 '삭제' 버튼 클릭 시
