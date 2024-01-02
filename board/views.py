@@ -181,7 +181,7 @@ def post_delete(request, post_id):
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
-    if user.user_id == post.question_user.user_id or post.question_user.role == "admin":
+    if user.user_id == post.question_user.user_id or user.role == "admin":
         post.is_deleted = True
         post.save()
         return JsonResponse(
