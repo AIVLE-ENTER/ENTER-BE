@@ -8,13 +8,6 @@ import json
 from django.middleware.csrf import get_token
 
 
-# csrf 토큰
-@csrf_exempt
-def get_csrf_token(request):
-    csrf_token = get_token(request)
-    return JsonResponse({"csrf_token": csrf_token})
-
-
 # 이메일로 인증번호 전송
 @require_POST
 @csrf_exempt
