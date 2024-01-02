@@ -33,7 +33,7 @@ def question_type_list(request):
     for type in types:
         type_info = {
             "question_type_id": type.question_type_id,
-            "question_type_ntitle": type.question_type_title,
+            "question_type_title": type.question_type_title,
         }
         type_list.append(type_info)
     return JsonResponse({"type_list": type_list})
