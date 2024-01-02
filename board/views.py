@@ -173,18 +173,15 @@ def post_create(request):
 # 게시글 삭제
 @csrf_exempt
 def post_delete(request, post_id):
+
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(
-            response,
-            status=400,
-            json_dumps_params={"ensure_ascii": False},
-        )
+        return JsonResponse(response, status=400)
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
-    if user.user_id == post.user.user_id or user.role == "admin":
+    if user.user_id == post.question_user.user_id or user.role == "admin":
         post.is_deleted = True
         post.save()
         return JsonResponse(
@@ -204,18 +201,34 @@ def post_delete(request, post_id):
 # 게시글 수정 페이지 화면
 @csrf_exempt
 def post_update_get(request, post_id):
-    post = get_object_or_404(Qnaboard, board_id=post_id)
 
+    user, response = validate_token(request)
+    if not response["success"]:
+        return JsonResponse(response, status=400)
+    
+    post = get_object_or_404(Qnaboard, board_id=post_id)
+    
+    if post.question_image_file:  # 이미지 파일이 있는 경우
+        question_image_url = post.question_image_file.url
+    else:  # 이미지 파일이 없는 경우
+        question_image_url = None
+
+    response_data = {
+        "board_id": post.board_id,
+        "question_type_title": post.question_type.question_type_title,
+        "user_name": post.question_user.user_name,
+        "question_datetime": post.question_datetime,
+        "question_title": post.question_title,
+        "question_content": post.question_content,
+        "question_image_file": ("http://localhost:8000/board" + question_image_url)
+            if question_image_url
+            else None,
+    }
+    
+    print(response_data)
+    
     return JsonResponse(
-        {
-            "board_id": post.board_id,
-            "question_type_title": post.question_type.question_type_title,
-            "user_name": post.question_user.user_name,
-            "question_datetime": post.question_datetime,
-            "question_title": post.question_title,
-            "question_content": post.question_content,
-            "question_image_file": post.question_image_file,
-        },
+        response_data,
         json_dumps_params={"ensure_ascii": False},
     )
 
@@ -224,14 +237,11 @@ def post_update_get(request, post_id):
 @csrf_exempt
 @require_POST
 def post_update_post(request, post_id):
+    
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(
-            response,
-            status=400,
-            json_dumps_params={"ensure_ascii": False},
-        )
+        return JsonResponse(response, status=400)
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
@@ -263,14 +273,11 @@ def post_update_post(request, post_id):
 @csrf_exempt
 @require_POST
 def answer_create(request, post_id):
+    
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(
-            response,
-            status=400,
-            json_dumps_params={"ensure_ascii": False},
-        )
+        return JsonResponse(response, status=400)
 
     if user.role == "admin":
         post = get_object_or_404(Qnaboard, board_id=post_id)

@@ -102,6 +102,8 @@ def memo_update(request):
     json_data = json.loads(request.body.decode("utf-8"))
     memo_id = json_data.get("memo_id")
     memo_content = json_data.get("memo_content")
+    print(json_data)
+    print(memo_id, memo_content)
 
     memo = Analysismemo.objects.filter(memo_id=memo_id)
 
@@ -124,9 +126,9 @@ def memo_update(request):
         )
 
     if user.user_id == memo.first().user.user_id:
-        memo.first().memo_content = memo_content
-
-        memo.first().save()
+        memo_updated = memo[0]
+        memo_updated.memo_content = memo_content
+        memo_updated.save()
 
         return JsonResponse(
             {"success": True, "message": "메모를 수정하였습니다."},
