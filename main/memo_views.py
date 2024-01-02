@@ -18,11 +18,11 @@ def memo_detail(request):
     memo = Analysismemo.objects.filter(memo_id=memo_id)
     memo_info = {}
     if memo.exists():
-        memo_info["memo_id "] = memo[0].memo_id
-        memo_info["memo_content "] = memo[0].memo_content
-        memo_info["created_datetime "] = memo[0].created_datetime
-        memo_info["modified_datetime "] = memo[0].modified_datetime
-        memo_info["user_id "] = user.user_id
+        memo_info["memo_id"] = memo[0].memo_id
+        memo_info["memo_content"] = memo[0].memo_content
+        memo_info["created_datetime"] = memo[0].created_datetime
+        memo_info["modified_datetime"] = memo[0].modified_datetime
+        memo_info["user_id"] = user.user_id
     
     return JsonResponse(
         {
