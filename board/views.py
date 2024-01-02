@@ -173,18 +173,15 @@ def post_create(request):
 # 게시글 삭제
 @csrf_exempt
 def post_delete(request, post_id):
+
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(
-            response,
-            status=400,
-            json_dumps_params={"ensure_ascii": False},
-        )
+        return JsonResponse(response, status=400)
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
-    if user.user_id == post.user.user_id or user.role == "admin":
+    if user.user_id == post.question_user.user_id or post.question_user.role == "admin":
         post.is_deleted = True
         post.save()
         return JsonResponse(
@@ -240,14 +237,11 @@ def post_update_get(request, post_id):
 @csrf_exempt
 @require_POST
 def post_update_post(request, post_id):
+    
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(
-            response,
-            status=400,
-            json_dumps_params={"ensure_ascii": False},
-        )
+        return JsonResponse(response, status=400)
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
@@ -279,14 +273,11 @@ def post_update_post(request, post_id):
 @csrf_exempt
 @require_POST
 def answer_create(request, post_id):
+    
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(
-            response,
-            status=400,
-            json_dumps_params={"ensure_ascii": False},
-        )
+        return JsonResponse(response, status=400)
 
     if user.role == "admin":
         post = get_object_or_404(Qnaboard, board_id=post_id)
