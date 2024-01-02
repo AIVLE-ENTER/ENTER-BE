@@ -30,6 +30,7 @@ def company_list(request):
 
 # 회원가입
 @require_POST
+@csrf_exempt
 def sign_up(request):
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))

@@ -11,7 +11,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from utils.common import validate_token, mask_name
 import json
-from urllib.parse import quote
+
 
 # Create your views here.
 
@@ -28,6 +28,7 @@ WHITE_LIST_EXT = [
 
 
 # Question Type 리스트
+@csrf_exempt
 def question_type_list(request):
     types = Questiontype.objects.all()
     type_list = []
@@ -41,6 +42,7 @@ def question_type_list(request):
 
 
 # 게시판 게시글 목록
+@csrf_exempt
 def post_list(request):
     # 문의 유형 드롭 다운 리스트
     type_qr = Questiontype.objects.all()
@@ -104,12 +106,12 @@ def post_list(request):
 
 
 # 게시글 상세 페이지
+@csrf_exempt
 def post_detail(request, post_id):
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
     if post.question_image_file:  # 이미지 파일이 있는 경우
         question_image_url = post.question_image_file.url
-        question_image_url_encoded = quote(question_image_url, safe=':/') # 이미지 파일 한글 이름 인코딩  
     else:  # 이미지 파일이 없는 경우
         question_image_url = None
 
@@ -122,13 +124,14 @@ def post_detail(request, post_id):
             "question_datetime": post.question_datetime,
             "question_title": post.question_title,
             "question_content": post.question_content,
-            "question_image_file": "http://localhost:8000/board" + question_image_url_encoded,
+            "question_image_file": ("http://localhost:8000/board" + question_image_url) if question_image_url else None,
         },
         json_dumps_params={"ensure_ascii": False},
     )
 
 
 # 게시글 작성
+@csrf_exempt
 def post_create(request):
     user, response = validate_token(request)
 
@@ -166,6 +169,7 @@ def post_create(request):
 
 
 # 게시글 삭제
+@csrf_exempt
 def post_delete(request, post_id):
     user, response = validate_token(request)
 
@@ -196,6 +200,7 @@ def post_delete(request, post_id):
 
 
 # 게시글 수정 페이지 화면
+@csrf_exempt
 def post_update_get(request, post_id):
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
@@ -214,6 +219,7 @@ def post_update_get(request, post_id):
 
 
 # 게시글 DB 수정
+@csrf_exempt
 @require_POST
 def post_update_post(request, post_id):
     user, response = validate_token(request)
@@ -245,6 +251,7 @@ def post_update_post(request, post_id):
 
 
 # 문의 답변 작성
+@csrf_exempt
 @require_POST
 def answer_create(request, post_id):
     user, response = validate_token(request)
@@ -278,6 +285,7 @@ def answer_create(request, post_id):
 
 
 # 문의 답변글 상세 페이지
+@csrf_exempt
 def answer_detail(request, post_id):
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
@@ -293,6 +301,7 @@ def answer_detail(request, post_id):
 
 
 # 마이페이지
+@csrf_exempt
 def myinfo(request):
     user, response = validate_token(request)
 

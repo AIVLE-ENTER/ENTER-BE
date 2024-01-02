@@ -8,6 +8,7 @@ import json
 
 
 # 메모 불러오기
+@csrf_exempt
 def memo_detail(request):
     user, response = validate_token(request)
     if not response["success"]:
@@ -45,6 +46,7 @@ def memo_detail(request):
 
 # 메모 작성
 @require_POST
+@csrf_exempt
 def memo_create(request):
     user, response = validate_token(request)
     if not response["success"]:
@@ -97,6 +99,7 @@ def memo_create(request):
 
 # 메모 수정
 @require_POST
+@csrf_exempt
 def memo_update(request):
     user, response = validate_token(request)
     if not response["success"]:
@@ -147,6 +150,7 @@ def memo_update(request):
 
 # 메모 삭제
 @require_POST
+@csrf_exempt
 def memo_delete(request):
     user, response = validate_token(request)
     if not response["success"]:

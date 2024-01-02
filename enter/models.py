@@ -2,7 +2,8 @@ from django.db import models
 
 
 class Analysismemo(models.Model):
-    memo_id = models.AutoField(primary_key=True)
+    id = models.AutoField(primary_key=True)
+    memo_id = models.CharField(max_length=40)
     memo_content = models.CharField(max_length=700)
     created_datetime = models.DateTimeField(auto_now_add=True)
     modified_datetime = models.DateTimeField(auto_now=True)

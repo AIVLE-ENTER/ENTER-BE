@@ -7,6 +7,7 @@ import json
 
 
 # 길이 유효성 검사 (길이 전부 통일)
+@csrf_exempt
 def validate_length(validations: list, max_length: int) -> (bool, dict):
     errors = []
 
@@ -26,6 +27,7 @@ def validate_length(validations: list, max_length: int) -> (bool, dict):
 
 
 # 채팅방 리스트
+@csrf_exempt
 def chat_window_list(request):
     # 토큰 검증
     user, response = validate_token(request)
@@ -57,6 +59,7 @@ def chat_window_list(request):
 
 # 채팅방 생성
 @require_POST
+@csrf_exempt
 def create_chat_window(request):
     # 토큰 검증
     user, response = validate_token(request)
@@ -96,6 +99,7 @@ def create_chat_window(request):
 
 
 # 채팅방 수정
+@csrf_exempt
 @require_POST
 def update_chat_window(request):
     # 토큰 검증
@@ -133,6 +137,7 @@ def update_chat_window(request):
 
 
 # 채팅방 삭제
+@csrf_exempt
 @require_POST
 def delete_chat_window(request):
     # 토큰 검증

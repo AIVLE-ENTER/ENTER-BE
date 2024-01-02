@@ -9,6 +9,7 @@ from django.middleware.csrf import get_token
 
 
 # csrf 토큰
+@csrf_exempt
 def get_csrf_token(request):
     csrf_token = get_token(request)
     return JsonResponse({"csrf_token": csrf_token})
@@ -16,6 +17,7 @@ def get_csrf_token(request):
 
 # 이메일로 인증번호 전송
 @require_POST
+@csrf_exempt
 def send_certification_number(request):
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
@@ -54,6 +56,7 @@ def send_certification_number(request):
 
 
 # 인증번호 확인
+@csrf_exempt
 def check_certification_number(request):
     email = request.GET.get("email")
     certification_number = int(request.GET.get("certification_number"))

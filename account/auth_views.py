@@ -12,6 +12,7 @@ import re
 
 # 로그인
 @require_POST
+@csrf_exempt
 def sign_in(request):
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
@@ -39,6 +40,7 @@ def sign_in(request):
 
 
 # 아이디 찾기
+@csrf_exempt
 @require_POST
 def find_id(request):
     # 데이터 받아오기
@@ -75,6 +77,7 @@ def find_id(request):
 
 # 비밀번호 변경
 @require_POST
+@csrf_exempt
 def chage_password(request):
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
@@ -133,6 +136,7 @@ def chage_password(request):
 
 # 회원 탈퇴
 @require_POST
+@csrf_exempt
 def sign_out(request):
     # 토큰 검증
     user, response = validate_token(request)
