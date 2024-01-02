@@ -17,31 +17,24 @@ def memo_detail(request):
     memo_id = request.GET.get("memo_id")
     memo = Analysismemo.objects.filter(memo_id=memo_id)
 
-    if memo.exists():
-        return JsonResponse(
-            {
-                "success": True,
-                "message": "메모를 불러왔습니다.",
-                "data": {
-                    "is_memo": memo.exists(),  # 메모 존재시:True, 미존재시:False
-                    "memo": {
-                        "memo_id": memo[0].memo_id,
-                        "memo_content": memo[0].memo_content,
-                        "created_datetime": memo[0].created_datetime,
-                        "modified_datetime": memo[0].modified_datetime,
-                        "user_id": user.user_id,
-                    },
+    return JsonResponse(
+        {
+            "success": True,
+            "message": "메모를 불러왔습니다.",
+            "data": {
+                "is_memo": memo.exists(),  # 메모 존재시:True, 미존재시:False
+                "memo": {
+                    "memo_id": memo[0].memo_id,
+                    "memo_content": memo[0].memo_content,
+                    "created_datetime": memo[0].created_datetime,
+                    "modified_datetime": memo[0].modified_datetime,
+                    "user_id": user.user_id,
                 },
             },
-            status=200,
-            json_dumps_params={"ensure_ascii": False},
-        )
-    else:
-        return JsonResponse(
-            {"success": False, "message": "불러올 메모가 없습니다."},
-            status=404,
-            json_dumps_params={"ensure_ascii": False},
-        )
+        },
+        status=200,
+        json_dumps_params={"ensure_ascii": False},
+    )
 
 
 # 메모 작성
