@@ -36,7 +36,6 @@ def frequent_message_list(request):
 
 
 # 자주쓰는 문구 생성
-@csrf_exempt
 @require_POST
 def create_frequent_message(request):
     # 토큰 검증
@@ -73,7 +72,6 @@ def create_frequent_message(request):
 
 
 # 자주쓰는 문구 수정
-@csrf_exempt
 @require_POST
 def update_frequent_message(request):
     # 토큰 검증
@@ -116,7 +114,6 @@ def update_frequent_message(request):
 
 
 # 자주쓰는 문구 삭제
-@csrf_exempt
 @require_POST
 def delete_frequent_message(request):
     # 토큰 검증

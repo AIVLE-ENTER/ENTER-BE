@@ -56,9 +56,8 @@ def chat_window_list(request):
 
 
 # 채팅방 생성
-@csrf_exempt
 @require_POST
-def create_chat_window(request):    
+def create_chat_window(request):
     # 토큰 검증
     user, response = validate_token(request)
     if not response["success"]:
@@ -79,7 +78,7 @@ def create_chat_window(request):
     is_validate, response_data = validate_length(validations, 20)
     if not is_validate:
         return JsonResponse(response_data, status=400)
-    
+
     # target 중복 체크
     chat_params = {"target_object": target_object, "user": user}
     if models.Chatwindow.objects.filter(**chat_params).exists():
@@ -97,7 +96,6 @@ def create_chat_window(request):
 
 
 # 채팅방 수정
-@csrf_exempt
 @require_POST
 def update_chat_window(request):
     # 토큰 검증
@@ -135,7 +133,6 @@ def update_chat_window(request):
 
 
 # 채팅방 삭제
-@csrf_exempt
 @require_POST
 def delete_chat_window(request):
     # 토큰 검증

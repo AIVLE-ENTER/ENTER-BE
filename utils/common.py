@@ -93,7 +93,7 @@ def create_token(user_id: str) -> str:
 
 # jwt 토큰 검증
 def validate_token(request: HttpRequest) -> (Users, dict):
-    auth_header = json.loads(request.headers.get("Authorization"))["Authorization"]
+    auth_header = json.loads(request.headers.get("common"))["Authorization"]
 
     if auth_header and auth_header.startswith("Bearer "):
         token = auth_header[len("Bearer ") :]

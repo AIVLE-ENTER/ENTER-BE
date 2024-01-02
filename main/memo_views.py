@@ -7,8 +7,7 @@ from utils.common import validate_token
 import json
 
 
-#메모 불러오기
-@csrf_exempt #csrf 무시하는 데코레이터. 테스트용
+# 메모 불러오기
 def memo_detail(request):
     user, response = validate_token(request)
     if not response["success"]:
@@ -38,12 +37,13 @@ def memo_detail(request):
         )
     else:
         return JsonResponse(
-            {"success": False, "message": "불러올 메모가 없습니다."}, status=404, json_dumps_params={"ensure_ascii": False},
+            {"success": False, "message": "불러올 메모가 없습니다."},
+            status=404,
+            json_dumps_params={"ensure_ascii": False},
         )
 
 
-#메모 작성
-@csrf_exempt
+# 메모 작성
 @require_POST
 def memo_create(request):
     user, response = validate_token(request)
@@ -59,19 +59,25 @@ def memo_create(request):
     # 받아온 memo_id 데이터 이미 존재하면 실패 응답
     if memo.exists():
         return JsonResponse(
-            {"success": False, "message": "해당 질문에 대한 메모가 이미 존재합니다."}, status=400, json_dumps_params={"ensure_ascii": False},
+            {"success": False, "message": "해당 질문에 대한 메모가 이미 존재합니다."},
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
         )
 
     # memo_content가 비어있을 경우 필수 데이터 누락으로 처리
     if not memo_content:
         return JsonResponse(
-            {"success": False, "message": "메모 내용이 작성되지 않았습니다."}, status=400, json_dumps_params={"ensure_ascii": False},
+            {"success": False, "message": "메모 내용이 작성되지 않았습니다."},
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
         )
 
     # 메모내용이 700자를 초과하는지 확인
     if len(memo_content) > 700:
         return JsonResponse(
-            {"success": False, "message": "메모 내용은 700자를 초과할 수 없습니다."}, status=400, json_dumps_params={"ensure_ascii": False},
+            {"success": False, "message": "메모 내용은 700자를 초과할 수 없습니다."},
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
         )
 
     # 메모 작성
@@ -90,7 +96,6 @@ def memo_create(request):
 
 
 # 메모 수정
-@csrf_exempt
 @require_POST
 def memo_update(request):
     user, response = validate_token(request)
@@ -141,7 +146,6 @@ def memo_update(request):
 
 
 # 메모 삭제
-@csrf_exempt
 @require_POST
 def memo_delete(request):
     user, response = validate_token(request)
@@ -161,10 +165,10 @@ def memo_delete(request):
             json_dumps_params={"ensure_ascii": False},
             status=200,
         )
-    
+
     else:
         return JsonResponse(
             {"success": False, "message": "잘못된 요청입니다. 삭제 권한은 작성자에게만 있습니다."},
             json_dumps_params={"ensure_ascii": False},
             status=403,
-        )        
+        )

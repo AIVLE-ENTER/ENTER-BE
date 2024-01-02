@@ -11,7 +11,6 @@ import re
 
 
 # 로그인
-@csrf_exempt
 @require_POST
 def sign_in(request):
     # 데이터 받아오기
@@ -40,7 +39,6 @@ def sign_in(request):
 
 
 # 아이디 찾기
-@csrf_exempt
 @require_POST
 def find_id(request):
     # 데이터 받아오기
@@ -76,7 +74,6 @@ def find_id(request):
 
 
 # 비밀번호 변경
-@csrf_exempt
 @require_POST
 def chage_password(request):
     # 데이터 받아오기
@@ -135,19 +132,18 @@ def chage_password(request):
 
 
 # 회원 탈퇴
-@csrf_exempt
 @require_POST
 def sign_out(request):
     # 토큰 검증
     user, response = validate_token(request)
     if not response["success"]:
         return JsonResponse(response, status=400)
-    
+
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
     user_id = json_data.get("user_id")
     password = json_data.get("password")
-    
+
     # 필수 데이터 누락
     if user_id is None or password is None:
         response_data = {"success": False, "message": "오류: 필수 데이터 누락"}
@@ -162,10 +158,13 @@ def sign_out(request):
     if user.password != encode_sha256(password):
         response_data = {"success": False, "message": "비밀번호가 일치하지 않습니다."}
         return JsonResponse(response_data, status=400)
-    
+
     # 탈퇴 권한
     if user_id != user.user_id:
-        response_data = {"success": False, "message": "잘못된 요청입니다. (로그인한 유저와 탈퇴하려는 유저가 다릅니다.)"}
+        response_data = {
+            "success": False,
+            "message": "잘못된 요청입니다. (로그인한 유저와 탈퇴하려는 유저가 다릅니다.)",
+        }
         return JsonResponse(response_data, status=400)
 
     # 탈퇴

@@ -127,7 +127,6 @@ def post_detail(request, post_id):
 
 
 # 게시글 작성
-@csrf_exempt
 def post_create(request):
     user, response = validate_token(request)
 
@@ -137,14 +136,14 @@ def post_create(request):
     if request.method == "POST":
         question_type_id = request.POST["question_type_id"]
         question_type = Questiontype.objects.get(question_type_id=question_type_id)
-        
+
         # 이미지 파일 처리
         if "image" in request.FILES:
             question_image_file = request.FILES["image"]
         else:
             # 이미지 파일이 전송되지 않은 경우, 기본값 또는 None으로 설정할 수 있음
             question_image_file = None
-            
+
         new_post = Qnaboard.objects.create(
             question_user=user,
             question_type=question_type,
@@ -169,18 +168,27 @@ def post_delete(request, post_id):
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(response, status=400, json_dumps_params={"ensure_ascii": False},)
+        return JsonResponse(
+            response,
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
+        )
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
     if user.user_id == post.user.user_id or user.role == "admin":
         post.is_deleted = True
         post.save()
-        return JsonResponse({"success": True, "message": "게시글 삭제 완료"}, status=200, json_dumps_params={"ensure_ascii": False},)
+        return JsonResponse(
+            {"success": True, "message": "게시글 삭제 완료"},
+            status=200,
+            json_dumps_params={"ensure_ascii": False},
+        )
 
     else:
         return JsonResponse(
-            {"success": False, "message": "게시글 삭제 권한이 없습니다."}, status=403,
+            {"success": False, "message": "게시글 삭제 권한이 없습니다."},
+            status=403,
             json_dumps_params={"ensure_ascii": False},
         )
 
@@ -209,7 +217,11 @@ def post_update_post(request, post_id):
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(response, status=400, json_dumps_params={"ensure_ascii": False},)
+        return JsonResponse(
+            response,
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
+        )
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
@@ -236,7 +248,11 @@ def answer_create(request, post_id):
     user, response = validate_token(request)
 
     if not response["success"]:
-        return JsonResponse(response, status=400, json_dumps_params={"ensure_ascii": False},)
+        return JsonResponse(
+            response,
+            status=400,
+            json_dumps_params={"ensure_ascii": False},
+        )
 
     if user.role == "admin":
         post = get_object_or_404(Qnaboard, board_id=post_id)

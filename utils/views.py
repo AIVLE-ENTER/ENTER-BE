@@ -5,10 +5,16 @@ from enter import models
 from utils.common import send_email, save_email_auth, is_valid_certification
 import random
 import json
+from django.middleware.csrf import get_token
+
+
+# csrf 토큰
+def get_csrf_token(request):
+    csrf_token = get_token(request)
+    return JsonResponse({"csrf_token": csrf_token})
 
 
 # 이메일로 인증번호 전송
-@csrf_exempt
 @require_POST
 def send_certification_number(request):
     # 데이터 받아오기

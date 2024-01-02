@@ -4,6 +4,7 @@ from . import views
 app_name = "utils"
 
 urlpatterns = [
+    path("getCsrfToken/", views.get_csrf_token),
     path(
         "checkCertificationNumber/",
         views.check_certification_number,

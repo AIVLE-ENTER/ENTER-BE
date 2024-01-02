@@ -29,7 +29,6 @@ def company_list(request):
 
 
 # 회원가입
-@csrf_exempt
 @require_POST
 def sign_up(request):
     # 데이터 받아오기
