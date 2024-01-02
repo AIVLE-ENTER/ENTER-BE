@@ -250,6 +250,13 @@ def post_update_post(request, post_id):
             json_dumps_params={"ensure_ascii": False},
             status=200,
         )
+    
+    else:
+        return JsonResponse(
+            {"success": False, "message": "게시글 수정 권한이 없습니다."},
+            status=403,
+            json_dumps_params={"ensure_ascii": False},
+        )
 
 
 # 문의 답변 작성
