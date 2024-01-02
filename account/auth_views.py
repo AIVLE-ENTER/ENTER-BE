@@ -78,12 +78,12 @@ def find_id(request):
 # 비밀번호 변경
 @require_POST
 @csrf_exempt
-def chage_password(request):
+def change_password(request):
     # 데이터 받아오기
     json_data = json.loads(request.body.decode("utf-8"))
     user_id = json_data.get("user_id")
     email = json_data.get("email")
-    certification_number = json_data.get("certification_number")
+    certification_number = int(json_data.get("certification_number"))
     password = json_data.get("password")
 
     # 필수 데이터 누락
@@ -112,6 +112,8 @@ def chage_password(request):
     is_certificate = (
         auth.is_verified is True and auth.certification_number == certification_number
     )
+    print(auth.is_verified)
+    print(auth.certification_number == certification_number)
     ten_minutes_ago = datetime.now() - timedelta(minutes=10)
     if not is_certificate:
         response_data = {"success": False, "message": "이메일 인증이 부적절하게 진행되었습니다."}
