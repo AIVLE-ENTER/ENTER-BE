@@ -37,6 +37,7 @@ def sign_up(request):
     company_id = json_data.get("company_id")
     password = json_data.get("password")
     certification_number = int(json_data.get("certification_number"))
+    type = json_data.get("type")
 
     # 회원가입 데이터
     data = {
@@ -85,6 +86,16 @@ def sign_up(request):
         errors["email_auth"] = "이메일 인증이 부적절하게 진행되었습니다. 다시 시도해주세요."
     elif queryset.created_datetime < ten_minutes_ago:
         errors["email_auth"] = "이메일 인증 후 시간이 10분이상 초과되었습니다. 다시 시도해주세요."
+
+    # 소셜 연동
+    if type:
+        social_id = json_data.get("social_id")
+        if type == "kakao":
+            data["kakao_id"] = social_id
+        elif type == "google":
+            data["google_id"] = social_id
+        elif type == "naver":
+            data["naver_id"] = social_id
 
     # 에러가 없으면 회원가입
     if errors == {}:
