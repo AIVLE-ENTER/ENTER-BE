@@ -19,7 +19,7 @@ def sign_in(request):
     user_id = json_data.get("user_id")
     password = encode_sha256(json_data.get("password"))
     type = json_data.get("type")
-    
+
     # 필수 데이터 누락
     if user_id is None or password is None:
         response_data = {"success": False, "message": "오류: 필수 데이터가 누락되었습니다."}
@@ -42,7 +42,7 @@ def sign_in(request):
             elif type == "naver":
                 user.naver_id = social_id
             user.save()
-        # jwt 토큰 발급    
+        # jwt 토큰 발급
         token = create_token(user_id)
         # 응답
         response_data = {

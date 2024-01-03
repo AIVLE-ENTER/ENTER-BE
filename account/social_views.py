@@ -43,13 +43,17 @@ def kakao_login(request):
         return JsonResponse(response_data, status=400)
 
     if not models.Users.objects.filter(kakao_id=kakao_id).exists():
-        response_data = {"success": True, "message": "not exists", "data": {"id": kakao_id}}
+        response_data = {
+            "success": True,
+            "message": "not exists",
+            "data": {"id": kakao_id},
+        }
         return JsonResponse(response_data, status=200)
 
     # jwt 토큰 발급하여 로그인
     user = models.Users.objects.get(kakao_id=kakao_id)
     print(user.user_id)
     token = create_token(user.user_id)
-    
+
     response_data = {"success": True, "message": "exists", "data": {"token": token}}
     return JsonResponse(response_data, status=200)
