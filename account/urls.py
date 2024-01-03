@@ -1,5 +1,5 @@
 from django.urls import path
-from . import auth_views, signup_views
+from . import auth_views, signup_views, social_views
 
 app_name = "account"
 
@@ -15,4 +15,7 @@ urlpatterns = [
     path("auth/signOut/", auth_views.sign_out, name="sign-out"),
     path("auth/userInfo/", auth_views.user_info, name="user-info"),
     # social_views.py (소셜 연동)
+    path("kakaoLogin/", social_views.kakao_login, name="kakao-login"),
+    # path("googleLogin/", social_views.google_login, name="google-login"),
+    # path("naverLogin/", social_views.naver_login, name="naver-login"),
 ]
