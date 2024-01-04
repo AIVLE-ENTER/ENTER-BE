@@ -206,32 +206,40 @@ def post_update_get(request, post_id):
     if not response["success"]:
         return JsonResponse(response, status=400)
     
-    post = get_object_or_404(Qnaboard, board_id=post_id)
-    
-    if post.question_image_file:  # 이미지 파일이 있는 경우
-        question_image_url = post.question_image_file.url
-    else:  # 이미지 파일이 없는 경우
-        question_image_url = None
+    if user.user_id == post.user.user_id:
+        post = get_object_or_404(Qnaboard, board_id=post_id)
+        
+        if post.question_image_file:  # 이미지 파일이 있는 경우
+            question_image_url = post.question_image_file.url
+        else:  # 이미지 파일이 없는 경우
+            question_image_url = None
 
-    response_data = {
-        "board_id": post.board_id,
-        "question_type_title": post.question_type.question_type_title,
-        "user_name": post.question_user.user_name,
-        "question_datetime": post.question_datetime,
-        "question_title": post.question_title,
-        "question_content": post.question_content,
-        "question_image_file": ("http://localhost:8000/board" + question_image_url)
-            if question_image_url
-            else None,
-    }
-    
-    print(response_data)
-    
-    return JsonResponse(
-        response_data,
-        json_dumps_params={"ensure_ascii": False},
-    )
-
+        response_data = {
+            "success": True,
+            "board_id": post.board_id,
+            "question_type_title": post.question_type.question_type_title,
+            "user_name": post.question_user.user_name,
+            "question_datetime": post.question_datetime,
+            "question_title": post.question_title,
+            "question_content": post.question_content,
+            "question_image_file": ("http://localhost:8000/board" + question_image_url)
+                if question_image_url
+                else None,
+        }
+        
+        print(response_data)
+        
+        return JsonResponse(
+            response_data,
+            status=200,
+            json_dumps_params={"ensure_ascii": False},
+        )
+    else:
+        return JsonResponse(
+            {"success": False, "message": "게시글 수정 권한이 없습니다."},
+            status=403,
+            json_dumps_params={"ensure_ascii": False},
+        )
 
 # 게시글 DB 수정
 @csrf_exempt
