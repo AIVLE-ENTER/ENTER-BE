@@ -206,8 +206,9 @@ def post_update_get(request, post_id):
     if not response["success"]:
         return JsonResponse(response, status=400)
     
+    post = get_object_or_404(Qnaboard, board_id=post_id)
+    
     if user.user_id == post.user.user_id:
-        post = get_object_or_404(Qnaboard, board_id=post_id)
         
         if post.question_image_file:  # 이미지 파일이 있는 경우
             question_image_url = post.question_image_file.url
