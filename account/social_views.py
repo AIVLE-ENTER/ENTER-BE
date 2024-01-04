@@ -10,7 +10,9 @@ from utils.common import create_token
 from enter.settings import get_env_variable
 
 
+kakao_access_uri = "https://kauth.kakao.com/oauth/token"
 kakao_profile_uri = "https://kapi.kakao.com/v2/user/me"
+naver_token_uri = "https://nid.naver.com/oauth2.0/token"
 naver_profile_uri = "https://openapi.naver.com/v1/nid/me"
 
 
@@ -29,8 +31,29 @@ def request_user_info(access_token, url):
 @csrf_exempt
 @require_POST
 def kakao_login(request):
-    # 토큰 받아오기
-    access_token = request.POST.get("access_token")
+    # data 받아오기
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError as e:
+        # JSON 디코딩 중에 오류가 발생한 경우
+        response_data = {"success": False, "message": "Invalid JSON format"}
+        return JsonResponse(response_data, status=400)
+    if not data:
+        response_data = {"success": False, "message": "data를 받아오지 못했습니다."}
+        return JsonResponse(response_data, status=400)
+
+    # code 추출
+    code = data["code"]
+    if not code:
+        response_data = {"success": False, "message": "인가코드를 받아오지 못했습니다."}
+        return JsonResponse(response_data, status=400)
+    
+    # access token 요청
+    CLIENT_ID = get_env_variable("KAKAO_CLIENT_ID")
+    CLIENT_SECRET = get_env_variable("KAKAO_CLIENT_SECRET")
+    REDIRECT_URI = "http://localhost:5500/signin_test.html?type=kakao"
+    token_req = requests.post(f"{kakao_access_uri}?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIRECT_URI}")
+    access_token = token_req.json().get('access_token')
 
     # kakao 회원정보 요청
     user_info_json = request_user_info(access_token, kakao_profile_uri)
@@ -84,7 +107,6 @@ def google_login(request):
 
     # 로그인 토큰 요청
     token_response = requests.post(token_url, data=token_payload)
-    print(token_response.json())
 
     if token_response.status_code == 200:
         access_token = token_response.json().get("access_token")
@@ -161,9 +183,9 @@ def naver_login(request):
     # access token 요청
     CLIENT_ID = get_env_variable("NAVER_CLIENT_ID")
     CLIENT_SECRET = get_env_variable("NAVER_CLIENT_SECRET")
-    REDIREC_URI = "http://localhost:5500/signin_test.html?type=naver"
+    REDIRECT_URI = "http://localhost:5500/signin_test.html?type=naver"
 
-    token_url = f"https://nid.naver.com/oauth2.0/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIREC_URI}"
+    token_url = f"{naver_token_uri}?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIRECT_URI}"
     token_req = requests.post(token_url)
     access_token = token_req.json().get("access_token")
 
