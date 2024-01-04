@@ -173,7 +173,6 @@ def post_create(request):
 # 게시글 삭제
 @csrf_exempt
 def post_delete(request, post_id):
-
     user, response = validate_token(request)
 
     if not response["success"]:
@@ -201,15 +200,13 @@ def post_delete(request, post_id):
 # 게시글 수정 페이지 화면
 @csrf_exempt
 def post_update_get(request, post_id):
-
     user, response = validate_token(request)
     if not response["success"]:
         return JsonResponse(response, status=400)
-    
+
     post = get_object_or_404(Qnaboard, board_id=post_id)
-    
-    if user.user_id == post.user.user_id:
-        
+
+    if user.user_id == post.question_user.user_id:
         if post.question_image_file:  # 이미지 파일이 있는 경우
             question_image_url = post.question_image_file.url
         else:  # 이미지 파일이 없는 경우
@@ -224,12 +221,12 @@ def post_update_get(request, post_id):
             "question_title": post.question_title,
             "question_content": post.question_content,
             "question_image_file": ("http://localhost:8000/board" + question_image_url)
-                if question_image_url
-                else None,
+            if question_image_url
+            else None,
         }
-        
+
         print(response_data)
-        
+
         return JsonResponse(
             response_data,
             status=200,
@@ -242,11 +239,11 @@ def post_update_get(request, post_id):
             json_dumps_params={"ensure_ascii": False},
         )
 
+
 # 게시글 DB 수정
 @csrf_exempt
 @require_POST
 def post_update_post(request, post_id):
-    
     user, response = validate_token(request)
 
     if not response["success"]:
@@ -269,7 +266,7 @@ def post_update_post(request, post_id):
             json_dumps_params={"ensure_ascii": False},
             status=200,
         )
-    
+
     else:
         return JsonResponse(
             {"success": False, "message": "게시글 수정 권한이 없습니다."},
@@ -282,7 +279,6 @@ def post_update_post(request, post_id):
 @csrf_exempt
 @require_POST
 def answer_create(request, post_id):
-    
     user, response = validate_token(request)
 
     if not response["success"]:
