@@ -11,6 +11,7 @@ from enter.settings import get_env_variable
 
 
 kakao_profile_uri = "https://kapi.kakao.com/v2/user/me"
+naver_profile_uri = "https://openapi.naver.com/v1/nid/me"
 
 
 # 회원 정보 요청 함수 (나중에 common.py로 옮기기)
@@ -24,6 +25,7 @@ def request_user_info(access_token, url):
     return user_info_json
 
 
+# 카카오 로그인
 @csrf_exempt
 @require_POST
 def kakao_login(request):
@@ -63,8 +65,8 @@ def kakao_login(request):
 @csrf_exempt
 @require_POST
 def google_login(request):
-    CLIENT_ID = get_env_variable("CLIENT_ID")
-    CLIENT_SECRET = get_env_variable("CLIENT_SECRET")
+    CLIENT_ID = get_env_variable("GOOGLE_CLIENT_ID")
+    CLIENT_SECRET = get_env_variable("GOOGLE_CLIENT_SECRET")
 
     # 클라이언트에서 받은 인가 코드
     json_data = json.loads(request.body.decode("utf-8"))
@@ -133,3 +135,66 @@ def google_login(request):
             status=500,
             json_dumps_params={"ensure_ascii": False},
         )
+
+
+# 네이버 로그인
+@csrf_exempt
+@require_POST
+def naver_login(request):
+    # data 받아오기
+    try:
+        data = json.loads(request.body.decode("utf-8"))
+    except json.JSONDecodeError as e:
+        # JSON 디코딩 중에 오류가 발생한 경우
+        response_data = {"success": False, "message": "Invalid JSON format"}
+        return JsonResponse(response_data, status=400)
+    if not data:
+        response_data = {"success": False, "message": "data를 받아오지 못했습니다."}
+        return JsonResponse(response_data, status=400)
+
+    # code 추출
+    code = data["code"]
+    if not code:
+        response_data = {"success": False, "message": "인가코드를 받아오지 못했습니다."}
+        return JsonResponse(response_data, status=400)
+
+    # access token 요청
+    CLIENT_ID = get_env_variable("NAVER_CLIENT_ID")
+    CLIENT_SECRET = get_env_variable("NAVER_CLIENT_SECRET")
+    REDIREC_URI = "http://localhost:5500/signin_test.html?type=naver"
+
+    token_url = f"https://nid.naver.com/oauth2.0/token?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIREC_URI}"
+    token_req = requests.post(token_url)
+    access_token = token_req.json().get("access_token")
+
+    # naver 회원정보 요청
+    url = f"{naver_profile_uri}?access_token={access_token}"
+    user_info_json = requests.get(url).json()
+    if not user_info_json:
+        response_data = {"success": False, "message": "유저 정보를 받아오지 못했습니다."}
+        return JsonResponse(response_data, status=400)
+
+    # 토큰 받아오기
+    access_token = request.POST.get("access_token")
+
+    # 회원가입 및 로그인
+    naver_id = user_info_json.get("id")
+
+    if not naver_id:
+        response_data = {"success": False, "message": "네이버 계정을 받아오지 못했습니다."}
+        return JsonResponse(response_data, status=400)
+
+    if not models.Users.objects.filter(naver_id=naver_id).exists():
+        response_data = {
+            "success": True,
+            "message": "not exists",
+            "data": {"id": naver_id},
+        }
+        return JsonResponse(response_data, status=200)
+
+    # jwt 토큰 발급하여 로그인
+    user = models.Users.objects.get(naver_id=naver_id)
+    token = create_token(user.user_id)
+
+    response_data = {"success": True, "message": "exists", "data": {"token": token}}
+    return JsonResponse(response_data, status=200)

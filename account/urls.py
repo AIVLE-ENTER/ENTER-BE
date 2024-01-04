@@ -17,5 +17,5 @@ urlpatterns = [
     # social_views.py (소셜 연동)
     path("kakaoLogin/", social_views.kakao_login, name="kakao-login"),
     path("googleLogin/", social_views.google_login, name="google-login"),
-    # path("naverLogin/", social_views.naver_login, name="naver-login"),
+    path("naverLogin/", social_views.naver_login, name="naver-login"),
 ]
