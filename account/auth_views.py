@@ -86,7 +86,7 @@ def find_id(request):
             "message": "해당하는 계정을 찾을 수 없습니다.",
             "id_list": id_list,
         }
-        return JsonResponse(response_data, status=400)
+        return JsonResponse(response_data, status=200)
 
 
 # 비밀번호 변경
