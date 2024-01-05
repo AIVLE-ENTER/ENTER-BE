@@ -47,13 +47,14 @@ def kakao_login(request):
     if not code:
         response_data = {"success": False, "message": "인가코드를 받아오지 못했습니다."}
         return JsonResponse(response_data, status=400)
-    
+
     # access token 요청
     CLIENT_ID = get_env_variable("KAKAO_CLIENT_ID")
     CLIENT_SECRET = get_env_variable("KAKAO_CLIENT_SECRET")
     REDIRECT_URI = "http://localhost:5500/signin_test.html?type=kakao"
-    token_req = requests.post(f"{kakao_access_uri}?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIRECT_URI}")
-    access_token = token_req.json().get('access_token')
+    token_url = f"{kakao_access_uri}?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIRECT_URI}"
+    token_req = requests.post(token_url)
+    access_token = token_req.json().get("access_token")
 
     # kakao 회원정보 요청
     user_info_json = request_user_info(access_token, kakao_profile_uri)
