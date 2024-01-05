@@ -69,7 +69,7 @@ def find_id(request):
 
     # 유저 찾기
     params = {"user_name": user_name, "user_email": email, "user_status": 0}
-    users = models.Users.objects.filter(**params)
+    users = models.Users.objects.filter(**params).order_by("register_datetime")
     id_list = [
         {
             "id": user.user_id,
