@@ -70,7 +70,13 @@ def find_id(request):
     # 유저 찾기
     params = {"user_name": user_name, "user_email": email, "user_status": 0}
     users = models.Users.objects.filter(**params)
-    id_list = [user.user_id for user in users]
+    id_list = [
+        {
+            "id": user.user_id,
+            "register_date": user.register_datetime.strftime("%Y-%m-%d"),
+        }
+        for user in users
+    ]
 
     # 응답
     if len(id_list) > 0:
