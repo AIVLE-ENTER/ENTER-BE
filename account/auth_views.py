@@ -29,7 +29,7 @@ def sign_in(request):
     params = {"user_id": user_id, "password": password, "user_status": 0}
     if not models.Users.objects.filter(**params).exists():
         response_data = {"success": False, "message": "로그인에 실패하였습니다."}
-        return JsonResponse(response_data, status=401)
+        return JsonResponse(response_data, status=200)
     else:
         # 소셜 연동
         if type != "":
