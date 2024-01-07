@@ -66,6 +66,7 @@ def post_list(request):
         .order_by("-question_datetime")
         .all()
     )
+    tot_post = len(posts)
 
     # 페이지 처리
     page = request.GET.get("page", 1)  # 기본값 1
@@ -95,7 +96,8 @@ def post_list(request):
         post_number -= 1
 
     return JsonResponse(
-        {
+        {   
+            "tot_post": tot_post,
             "post_list": post_list,
             "keyword": keyword,
             "page": page,
