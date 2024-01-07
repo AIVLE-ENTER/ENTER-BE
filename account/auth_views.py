@@ -53,6 +53,13 @@ def sign_in(request):
         return JsonResponse(response_data, status=200)
 
 
+# 아이디 존재여부 확인
+def check_id(request):
+    check_id = request.GET.get("id")
+    is_exist = models.Users.objects.filter(user_id=check_id).exists()
+    return JsonResponse({"is_exist": is_exist})
+
+
 # 아이디 찾기
 @csrf_exempt
 @require_POST
@@ -132,8 +139,6 @@ def change_password(request):
     is_certificate = (
         auth.is_verified is True and auth.certification_number == certification_number
     )
-    print(auth.is_verified)
-    print(auth.certification_number == certification_number)
     ten_minutes_ago = datetime.now() - timedelta(minutes=10)
     if not is_certificate:
         response_data = {"success": False, "message": "이메일 인증이 부적절하게 진행되었습니다."}

@@ -9,6 +9,7 @@ urlpatterns = [
     path("signUp/company/", signup_views.company_list, name="company-list"),
     path("signUp/", signup_views.sign_up, name="sign-up"),
     # auth_views.py (로그인, 아이디 찾기, 비밀번호 변경, 회원 탈퇴)
+    path("auth/checkId/", auth_views.check_id, name="check-id"),
     path("auth/signIn/", auth_views.sign_in, name="sign-in"),
     path("auth/findID/", auth_views.find_id, name="find-id"),
     path("auth/changePassword/", auth_views.change_password, name="chage-password"),
