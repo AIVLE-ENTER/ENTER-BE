@@ -188,7 +188,7 @@ def sign_out(request):
     user = models.Users.objects.filter(**user_params)[0]
     if user.password != encode_sha256(password):
         response_data = {"success": False, "message": "비밀번호가 일치하지 않습니다."}
-        return JsonResponse(response_data, status=400)
+        return JsonResponse(response_data, status=200)
 
     # 탈퇴 권한
     if user_id != user.user_id:
@@ -196,7 +196,7 @@ def sign_out(request):
             "success": False,
             "message": "잘못된 요청입니다. (로그인한 유저와 탈퇴하려는 유저가 다릅니다.)",
         }
-        return JsonResponse(response_data, status=400)
+        return JsonResponse(response_data, status=200)
 
     # 탈퇴
     user.user_status = 1
