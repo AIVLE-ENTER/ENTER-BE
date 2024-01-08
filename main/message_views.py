@@ -36,6 +36,35 @@ def frequent_message_list(request):
     return JsonResponse(response_data, status=200)
 
 
+# 자주쓰는 문구 상세
+def frequent_message_detail(request, template_id):
+    message = models.Prompttemplates.objects.filter(
+        template_id=template_id, is_deleted=False
+    )
+    print(message)
+
+    if message.exists():
+        message_data = {
+            "template_id": message[0].template_id,
+            "template_name": message[0].template_name,
+            "template_content": message[0].template_content,
+            "created_datetime": message[0].created_datetime,
+            "modified_datetime": message[0].modified_datetime,
+        }
+        response_data = {
+            "success": True,
+            "message": "자주쓰는 문구를 불러왔습니다.",
+            "data": message_data,
+        }
+        return JsonResponse(response_data, status=200)
+    else:
+        response_data = {
+            "success": False,
+            "message": "존재하지 않는 문구입니다.",
+        }
+        return JsonResponse(response_data, status=400)
+
+
 # 자주쓰는 문구 생성
 @csrf_exempt
 @require_POST
