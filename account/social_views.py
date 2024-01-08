@@ -201,7 +201,7 @@ def naver_login(request):
     access_token = request.POST.get("access_token")
 
     # 회원가입 및 로그인
-    naver_id = user_info_json.get("id")
+    naver_id = user_info_json.get("response").get("id")
 
     if not naver_id:
         response_data = {"success": False, "message": "네이버 계정을 받아오지 못했습니다."}
