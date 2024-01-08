@@ -69,7 +69,7 @@ def kakao_login(request):
         response_data = {"success": False, "message": "카카오 계정을 받아오지 못했습니다."}
         return JsonResponse(response_data, status=400)
 
-    if not models.Users.objects.filter(kakao_id=kakao_id).exists():
+    if not models.Users.objects.filter(kakao_id=kakao_id, user_status=0).exists():
         response_data = {
             "success": True,
             "message": "not exists",
@@ -128,7 +128,9 @@ def google_login(request):
                 response_data = {"success": False, "message": "구글 계정을 받아오지 못했습니다."}
                 return JsonResponse(response_data, status=400)
 
-            if not models.Users.objects.filter(google_id=google_id).exists():
+            if not models.Users.objects.filter(
+                google_id=google_id, user_status=0
+            ).exists():
                 response_data = {
                     "success": True,
                     "message": "not exists",
@@ -207,7 +209,7 @@ def naver_login(request):
         response_data = {"success": False, "message": "네이버 계정을 받아오지 못했습니다."}
         return JsonResponse(response_data, status=400)
 
-    if not models.Users.objects.filter(naver_id=naver_id).exists():
+    if not models.Users.objects.filter(naver_id=naver_id, user_status=0).exists():
         response_data = {
             "success": True,
             "message": "not exists",
