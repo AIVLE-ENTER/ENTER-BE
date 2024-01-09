@@ -96,7 +96,7 @@ def post_list(request):
         post_number -= 1
 
     return JsonResponse(
-        {   
+        {
             "tot_post": tot_post,
             "post_list": post_list,
             "keyword": keyword,
@@ -123,6 +123,7 @@ def post_detail(request, post_id):
             "board_id": post.board_id,
             "question_type_title": post.question_type.question_type_title,
             "user_name": post.question_user.user_name,
+            "user_id": post.question_user.user_id,
             "question_datetime": post.question_datetime,
             "question_title": post.question_title,
             "question_content": post.question_content,
