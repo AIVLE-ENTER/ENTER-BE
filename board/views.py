@@ -288,6 +288,9 @@ def post_update_post(request, post_id):
 @require_POST
 def answer_create(request, post_id):
     user, response = validate_token(request)
+    # 데이터 받아오기
+    json_data = json.loads(request.body.decode("utf-8"))
+    answer_content = json_data.get("answer_content")
 
     if not response["success"]:
         return JsonResponse(response, status=400)
@@ -295,8 +298,9 @@ def answer_create(request, post_id):
     if user.role == "admin":
         post = get_object_or_404(Qnaboard, board_id=post_id)
 
-        post.answer_content = request.POST.get("answer_content")
+        post.answer_content = answer_content
         post.answer_datetime = timezone.now()
+        post.answer_admin = user
         post.save()
         return JsonResponse(
             {"success": True, "message": "답변이 작성되었습니다."},
@@ -309,7 +313,7 @@ def answer_create(request, post_id):
         return JsonResponse(
             {"success": False, "message": "권한이 없습니다."},
             json_dumps_params={"ensure_ascii": False},
-            status=403,
+            status=200,
         )
 
 
