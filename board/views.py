@@ -128,7 +128,7 @@ def post_detail(request, post_id):
             "question_title": post.question_title,
             "question_content": post.question_content,
             "answer_content": post.answer_content,
-            "answer_admin_name": post.answer_admin.user_name,
+            "answer_admin_name": None if post.answer_admin is None else post.answer_admin.user_name,
             "answer_datetime": post.answer_datetime,
             "question_image_file": ("http://localhost:8000/board" + question_image_url)
             if question_image_url
