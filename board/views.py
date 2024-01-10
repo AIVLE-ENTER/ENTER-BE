@@ -257,13 +257,15 @@ def post_update_post(request, post_id):
 
     post = get_object_or_404(Qnaboard, board_id=post_id)
 
-    if user.user_id == post.user.user_id:
+    if user.user_id == post.question_user.user_id:
         question_type_id = request.POST["question_type_id"]
         question_type = Questiontype.objects.get(question_type_id=question_type_id)
         post.question_type = question_type
         post.question_title = request.POST.get("question_title")
         post.question_content = request.POST.get("question_content")
-        post.question_image_file = request.FILES["image"]
+        
+        if "image" in request.FILES:
+            post.question_image_file = request.FILES["image"]
 
         post.save()
 
