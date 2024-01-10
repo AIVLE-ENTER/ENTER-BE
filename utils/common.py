@@ -65,7 +65,7 @@ def is_valid_certification(email: str, input_number: int, purpose: str) -> dict:
     return {"success": True, "message": "인증이 성공적으로 완료되었습니다."}
 
 
-# sha256 암호화
+# SHA256 암호화
 def encode_sha256(str: str) -> str:
     result = ""
     for s in str:

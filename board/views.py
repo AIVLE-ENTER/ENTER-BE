@@ -11,6 +11,11 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from utils.common import validate_token, mask_name
 import json
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+from os.path import splitext
+
 
 
 # Create your views here.
@@ -153,6 +158,14 @@ def post_create(request):
         # 이미지 파일 처리
         if "image" in request.FILES:
             question_image_file = request.FILES["image"]
+            
+            # 파일명에서 확장자 추출
+            file_extension = splitext(question_image_file.name)[1].lower()
+
+            # 원하는 확장자가 아닌 경우 None 할당
+            if file_extension not in WHITE_LIST_EXT:
+                question_image_file = None
+                
         else:
             # 이미지 파일이 전송되지 않은 경우, 기본값 또는 None으로 설정할 수 있음
             question_image_file = None
