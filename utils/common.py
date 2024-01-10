@@ -58,8 +58,8 @@ def is_valid_certification(email: str, input_number: int, purpose: str) -> dict:
     if queryset.created_datetime < five_minutes_ago:
         return {"success": False, "message": "시간이 초과하였습니다. 다시 시도해주세요."}
 
-    # 인증 완료시 is_verified 값 바꾸기
-    queryset.is_verified = True
+    # 인증 완료시 is_vertified 값 바꾸기
+    queryset.is_vertified = True
     queryset.save()
 
     return {"success": True, "message": "인증이 성공적으로 완료되었습니다."}

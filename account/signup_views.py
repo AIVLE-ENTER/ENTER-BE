@@ -76,7 +76,7 @@ def sign_up(request):
         email=data["user_email"], purpose="signup"
     ).order_by("-auth_id")[0]
     is_certificate = (
-        queryset.is_verified is True
+        queryset.is_vertified is True
         and queryset.certification_number == certification_number
     )
     ten_minutes_ago = datetime.now() - timedelta(minutes=10)

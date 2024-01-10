@@ -134,7 +134,7 @@ class Emailauth(models.Model):
     certification_number = models.IntegerField()
     purpose = models.CharField(max_length=20)
     created_datetime = models.DateTimeField(auto_now_add=True)
-    is_verified = models.BooleanField(default=False)
+    is_vertified = models.BooleanField(default=False)
 
     class Meta:
         # managed = False

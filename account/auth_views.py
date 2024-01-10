@@ -137,7 +137,7 @@ def change_password(request):
     auth_params = {"email": email, "purpose": "findPW"}
     auth = models.Emailauth.objects.filter(**auth_params).order_by("-auth_id")[0]
     is_certificate = (
-        auth.is_verified is True and auth.certification_number == certification_number
+        auth.is_vertified is True and auth.certification_number == certification_number
     )
     ten_minutes_ago = datetime.now() - timedelta(minutes=10)
     if not is_certificate:
