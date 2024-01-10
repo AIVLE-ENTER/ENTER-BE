@@ -1,4 +1,34 @@
 from django.db import models
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.utils.translation import gettext_lazy as _
+
+# 업로드 하는 파일에 대한 개수, 크기, 확장자 제한
+FILE_COUNT_LIMIT = 3
+# 업로드 하는 파일의 최대 사이즈 제한. 5MB : 5242880(5*1024*1024)
+FILE_SIZE_LIMIT = 5242880
+# 업로드 허용 확장자
+WHITE_LIST_EXT = [
+    ".jpg",
+    ".jpeg",
+    ".png",
+]
+
+def validate_file_count(value):
+    # 파일 개수 제한 확인
+    if len(value) > FILE_COUNT_LIMIT:
+        raise ValidationError(_('최대 %s개까지만 업로드 가능합니다.') % FILE_COUNT_LIMIT)
+
+def validate_file_size(value):
+    # 파일 크기 제한 확인
+    if value.size > FILE_SIZE_LIMIT:
+        raise ValidationError(_('파일 크기는 최대 %s보다 작아야 합니다.') % FILE_SIZE_LIMIT)
+
+def validate_file_extension(value):
+    # 파일 확장자 제한 확인
+    ext = os.path.splitext(value.name)[1]  # 파일 확장자 가져오기
+    if not ext.lower() in WHITE_LIST_EXT:
+        raise ValidationError(_('지원하지 않는 확장자입니다.'))
 
 
 class Analysismemo(models.Model):
@@ -79,7 +109,7 @@ class Qnaboard(models.Model):
     question_type = models.ForeignKey("Questiontype", on_delete=models.CASCADE)
     question_title = models.CharField(max_length=30)
     question_content = models.CharField(max_length=100)
-    question_image_file = models.ImageField(null=True, upload_to="", blank=True)
+    question_image_file = models.ImageField(null=True, upload_to="", blank=True, validators=[validate_file_count, validate_file_size, validate_file_extension])
     question_datetime = models.DateTimeField(auto_now_add=True)
     modified_datetime = models.DateTimeField(auto_now=True)
     answer_admin = models.ForeignKey(
