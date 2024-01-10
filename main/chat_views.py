@@ -42,7 +42,6 @@ def chat_window_list(request):
             "chat_window_id": chat.chat_window_id,
             "target_object": chat.target_object,
             "title": chat.title,
-            "crawling_text": chat.crawling_text,
             "created_datetime": chat.created_datetime,
             "modified_datetime": chat.modified_datetime,
         }
