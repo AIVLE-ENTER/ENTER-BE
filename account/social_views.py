@@ -51,7 +51,7 @@ def kakao_login(request):
     # access token 요청
     CLIENT_ID = get_env_variable("KAKAO_CLIENT_ID")
     CLIENT_SECRET = get_env_variable("KAKAO_CLIENT_SECRET")
-    REDIRECT_URI = "http://localhost:5500/signin_test.html?type=kakao"
+    REDIRECT_URI = "http://localhost:5500/signin.html?type=kakao"
     token_url = f"{kakao_access_uri}?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIRECT_URI}"
     token_req = requests.post(token_url)
     access_token = token_req.json().get("access_token")
@@ -102,7 +102,7 @@ def google_login(request):
         "code": authorization_code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
-        "redirect_uri": "http://localhost:5500/signin_test.html?type=google",
+        "redirect_uri": "http://localhost:5500/signin.html?type=google",
         "grant_type": "authorization_code",
     }
 
@@ -186,7 +186,7 @@ def naver_login(request):
     # access token 요청
     CLIENT_ID = get_env_variable("NAVER_CLIENT_ID")
     CLIENT_SECRET = get_env_variable("NAVER_CLIENT_SECRET")
-    REDIRECT_URI = "http://localhost:5500/signin_test.html?type=naver"
+    REDIRECT_URI = "http://localhost:5500/signin.html?type=naver"
 
     token_url = f"{naver_token_uri}?client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&code={code}&grant_type=authorization_code&redirect_uri={REDIRECT_URI}"
     token_req = requests.post(token_url)
